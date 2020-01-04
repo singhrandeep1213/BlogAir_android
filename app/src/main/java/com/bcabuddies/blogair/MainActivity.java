@@ -1,8 +1,10 @@
-package com.example.blogair;
+package com.bcabuddies.blogair;
+
+import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.bcabuddies.blogair.R;
 
 public class MainActivity extends AppCompatActivity {
 
