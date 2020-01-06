@@ -1,5 +1,6 @@
 commands to be exectued for npm:
 	-> npm init -yes
+	-> npm install
 	-> npm install --save express
 	-> npm install --save express
 	-> npm install --save body-parser
