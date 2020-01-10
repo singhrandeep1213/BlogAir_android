@@ -25,7 +25,7 @@ public class Welcome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_welcome);
 
-        viewModel = ViewModelProviders.of(this, new WelcomeViewModelFactory(this, binding.welcomeBaseLayout))
+        viewModel = ViewModelProviders.of(this, new WelcomeViewModelFactory(this, binding.getRoot()))
                 .get(WelcomeViewModel.class);
 
         binding.setViewModel(viewModel);
