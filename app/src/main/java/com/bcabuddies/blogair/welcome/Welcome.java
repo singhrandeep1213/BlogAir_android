@@ -1,6 +1,8 @@
 package com.bcabuddies.blogair.welcome;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -25,6 +27,10 @@ public class Welcome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_welcome);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
         viewModel = ViewModelProviders.of(this, new WelcomeViewModelFactory(this, binding.getRoot()))
                 .get(WelcomeViewModel.class);
 
@@ -41,8 +47,8 @@ public class Welcome extends AppCompatActivity {
 
     private void addImageData() {
         //right now it is static, change it to dynamic
-        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.ku26itnont711));
-        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.leaves_plant_dark_129098_800x1420));
-        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.lpyx));
+        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.slider_image_1));
+        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.slider_image_2));
+        viewPagerImageList.add(new WelcomeViewPagerModel(R.drawable.slider_image_3));
     }
 }
