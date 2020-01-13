@@ -5,4 +5,13 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="desc">desc</string>
+    <string name="default_like_count">0</string>
+    <string name="full_name">Full Name</string>
+    <string name="like_icon">like_icon</string>
+    <string name="post_image">post_image</string>
+    <string name="default_user_icon">default_user_icon</string>
+    <string name="dots">dots</string>
+    <string name="comments">comments</string>
+    <string name="username">Username</string>
+    <string name="sample_post_desc">This is sample post description</string>
 </resources>
