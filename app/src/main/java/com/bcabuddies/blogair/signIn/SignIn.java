@@ -18,6 +18,7 @@ import com.bcabuddies.blogair.model.LoginToken;
 import com.bcabuddies.blogair.model.LoginUser;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
+import com.bcabuddies.blogair.welcome.Welcome;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class SignIn extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startActivity(new Intent(SignIn.this, Welcome.class));
+                startActivity(new Intent(SignIn.this, Welcome.class));
                 SignIn.this.finish();
             }
         });

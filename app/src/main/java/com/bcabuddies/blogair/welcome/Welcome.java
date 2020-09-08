@@ -18,6 +18,7 @@ import com.bcabuddies.blogair.adapter.WelcomeViewPagerAdapter;
 import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.WelcomeViewPagerModel;
 import com.bcabuddies.blogair.signIn.SignIn;
+import com.bcabuddies.blogair.signUp.SignUp;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.google.android.material.tabs.TabLayout;
@@ -59,11 +60,22 @@ public class Welcome extends AppCompatActivity {
         btnSignIn=findViewById(R.id.welcome_signInBtn);
         btnSignUp=findViewById(R.id.welcome_signUpBtn);
 
-        //btnclick
+        //sign in button click
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(Welcome.this, SignIn.class));
+                Welcome.this.finish();
+            }
+        });
+
+
+        //sign up button click
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Welcome.this, SignUp.class));
+                Welcome.this.finish();
             }
         });
 

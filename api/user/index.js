@@ -6,6 +6,7 @@ const SecretKey ='K27eEaz9sKC7cFnIBjxY4i0tucCTdmgN6Oe-iMv7Lsjcu0wo_coM_tnYekUM8H
 const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9RahulGaurqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvRGjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcL22";
 const bodyparser=require('body-parser');
 var multer  = require('multer');
+const verify = require('jsonwebtoken/verify');
 var upload = multer();
 
 app.use(bodyparser.json());
@@ -22,7 +23,7 @@ var mysqlConnection= mysql.createConnection({
 	
 });
 
-
+//connect to database
 mysqlConnection.connect((err)=>{
 	if(!err)
 		console.log('DB connecton status: Connected sucessfully');
@@ -90,6 +91,71 @@ app.post('/user',(req,res)=>{
 				console.log(err);
 	})
 });
+
+//register a user pass full_name, email_id, password, uid
+app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
+
+	if(req.key==HeaderKey){
+		var data=req.body;
+		var full_name= data.full_name;
+		var email_id=data.email_id;
+		var password=data.password;
+		var uid=data.uid;
+		var thumb_image='https://toppng.com/uploads/preview/file-svg-user-icon-material-desi-11563317072p2p27gjccw.png';
+		console.log('register request: ');
+		console.log('full_naame:  ', full_name);
+		console.log('email_id:  ',email_id);
+		console.log('password:  ',password);
+		
+		mysqlConnection.query('insert into user(uid,email_id,full_name,password) values (?,?,?,?)' ,[uid,email_id,full_name,password], async function(err,rows) {
+			if(!err){
+				const user ={
+					id: uid,
+					email_id:email_id,
+					full_name:full_name
+				}
+
+				jwt.sign({user :user}, SecretKey, async (err, token)=>{
+					if(!!err){
+						console.log('error creating token ', err);
+							const obj = [{
+								message: 'Login failed',
+								error: true,
+								token: null
+							}];
+							res.status(400).send(obj);
+					}
+					else{
+						const obj ={
+							message :'login success',
+							error: false,
+							token: token,
+							name: full_name,
+							thumb_image:thumb_image,
+							uid: uid
+						};
+						console.log("----------------------");
+						console.log(obj);
+						console.log("----------------------");
+						res.status(200).json(obj);
+					}
+
+				})
+
+			}
+			else{
+				console.log('error in register:  ',err);
+			}
+		} )
+	
+
+	}
+	else {
+        res.status(400).send();
+    }
+
+});
+
 
 //get all posts
 app.get('/post',(req,res)=>{
