@@ -111,8 +111,6 @@ public class SignUp extends AppCompatActivity {
                 Log.e(TAG, "onResponse: reg token:  "+loginToken);
                 startActivity(new Intent(SignUp.this, MainActivity.class));
                 SignUp.this.finish();
-
-
             }
 
             @Override

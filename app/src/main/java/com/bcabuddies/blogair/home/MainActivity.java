@@ -88,15 +88,26 @@ public class MainActivity extends AppCompatActivity {
         listCall.enqueue(new Callback<List<HomeFeed>>() {
             @Override
             public void onResponse(Call<List<HomeFeed>> call, Response<List<HomeFeed>> response) {
-              /*  if (!response.isSuccessful()) {
+               /*if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: code " + response.code());
-                }*/
+                }
+*/
+                //List<HomeFeed> homeFeeds = response.body();
+               /* if (homeFeeds!=null){
+                    finalList.addAll(homeFeeds);
+                    homeRecyclerAdapter.notifyDataSetChanged();
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "no post", Toast.LENGTH_SHORT).show();
+                }
+*/
+                Log.e(TAG, "onResponse: final" + finalList);
 
                 if (response.body() == null) {
                     Log.e(TAG, "onResponse: errr:  " + response.body());
                     //Log.e(TAG, "onResponse: errr: + "+response.body() );
                     noMoreResults = true;
-                } else {
+                }else {
                     List<HomeFeed> homeFeeds = response.body();
                     finalList.addAll(homeFeeds);
                     homeRecyclerAdapter.notifyDataSetChanged();

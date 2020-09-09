@@ -8,6 +8,7 @@ const bodyparser=require('body-parser');
 var multer  = require('multer');
 const verify = require('jsonwebtoken/verify');
 var upload = multer();
+var uuid=require('uuid');
 
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -34,6 +35,11 @@ mysqlConnection.connect((err)=>{
 app.listen(3000,()=>console.log('express server is running at port no : 3000'),'192.168.4.159');
 
 
+//random uid test
+app.get('/randomuid',(req,res)=>{
+	var random_num= uuid.v4();
+	res.send(random_num);
+});
 
 
 //get all users
@@ -101,6 +107,8 @@ app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
 		var email_id=data.email_id;
 		var password=data.password;
 		var uid=data.uid;
+
+		//change this while live server
 		var thumb_image='https://toppng.com/uploads/preview/file-svg-user-icon-material-desi-11563317072p2p27gjccw.png';
 		console.log('register request: ');
 		console.log('full_naame:  ', full_name);
@@ -119,7 +127,7 @@ app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
 					if(!!err){
 						console.log('error creating token ', err);
 							const obj = [{
-								message: 'Login failed',
+								message: 'register failed',
 								error: true,
 								token: null
 							}];
@@ -127,13 +135,25 @@ app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
 					}
 					else{
 						const obj ={
-							message :'login success',
+							message :'register success',
 							error: false,
 							token: token,
 							name: full_name,
 							thumb_image:thumb_image,
 							uid: uid
 						};
+					//change this to blogair user while live server
+					var fid=uuid.v4();
+						mysqlConnection.query('insert into follow(fid,follower_uid,following_uid ) values(?,?,"1") ' , [fid,uid], async function(err,rows){
+							if(!err){
+								console.log('followed user 1 successfully');
+								
+							}
+							else{
+								console.log('error while following 1: ',err);
+							}
+						} )  
+						
 						console.log("----------------------");
 						console.log(obj);
 						console.log("----------------------");
@@ -202,6 +222,9 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY time_stamp desc )limit ?,?',[uid,uid,start_limit,end_limit],(err,rows,fields)=>{
 				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
 					//No more posts
+					console.log('uid passed with error:  ',uid);
+					console.log('page_no passed with error:  ',page_no);
+
 					console.log('Error while getting posts: ', err);
 					res.json(null);
 				}
