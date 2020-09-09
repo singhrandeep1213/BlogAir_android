@@ -39,12 +39,67 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/home_bottomLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#EDEDED"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="#EDEDED">
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:padding="5dp"
+            android:id="@+id/home_homeicon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/home_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/home_searchicon"/>
+
+        <ImageView
+            android:padding="5dp"
+            android:id="@+id/home_searchicon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/search_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/home_addicon"
+            app:layout_constraintStart_toEndOf="@+id/home_homeicon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:padding="2dp"
+            android:id="@+id/home_addicon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/add_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:padding="5dp"
+            android:id="@+id/home_bookmarkicon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bookmarks_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/home_accounticon"
+            app:layout_constraintStart_toEndOf="@id/home_addicon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:padding="5dp"
+            android:id="@+id/home_accounticon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/account_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/home_bookmarkicon"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
