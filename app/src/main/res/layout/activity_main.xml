@@ -7,7 +7,7 @@
     tools:context=".home.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ome_toplayout"
+        android:id="@+id/home_toplayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -16,6 +16,7 @@
         android:background="#EDEDED">
 
         <TextView
+            android:id="@+id/home_toplayouttv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -28,14 +29,15 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/home_recyclerView"
+    <FrameLayout
+        android:id="@+id/home_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/home_bottomLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ome_toplayout" />
+        app:layout_constraintTop_toBottomOf="@+id/home_toplayout" />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/home_bottomLayout"
@@ -80,7 +82,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:padding="5dp"
+            android:padding="7dp"
             android:id="@+id/home_bookmarkicon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -90,11 +92,24 @@
             app:layout_constraintStart_toEndOf="@id/home_addicon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+
+        <de.hdodenhof.circleimageview.CircleImageView
+
+            android:id="@+id/home_circleoutline"
             android:padding="5dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/circle_outline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/home_bookmarkicon"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:padding="8dp"
             android:id="@+id/home_accounticon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+             android:layout_height="48dp"
             android:src="@drawable/account_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

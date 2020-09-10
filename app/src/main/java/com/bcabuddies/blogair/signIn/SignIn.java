@@ -115,6 +115,7 @@ public class SignIn extends AppCompatActivity {
                 preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
                 preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
                 preferenceManager.saveString(Constants.KEY_UID, uid);
+                preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumbImage);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(new Intent(SignIn.this, MainActivity.class));
 

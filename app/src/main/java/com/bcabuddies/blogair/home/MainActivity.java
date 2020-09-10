@@ -1,131 +1,123 @@
 package com.bcabuddies.blogair.home;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
 
-import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
-import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.home.fragments.BookmarksFragment;
+import com.bcabuddies.blogair.home.fragments.HomeFeedFragment;
+import com.bcabuddies.blogair.home.fragments.ProfileFragment;
+import com.bcabuddies.blogair.home.fragments.SearchFragment;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
+import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private homeRecyclerAdapter homeRecyclerAdapter;
+    private Fragment fragment = null;
     private static final String TAG = "MainActivity";
-    List<HomeFeed> finalList;
+    TextView topLayoutTv;
     PreferenceManager preferenceManager;
-    String token, uid, fullName;
-    int pageCount = 1;
-    boolean noMoreResults = false;
-    boolean listEnd = false;
-
+    String thumb_image;
+    ImageView homeIcon, searchIcon, addIcon, bookmarkIcon;
+    CircleImageView profileIcon, profileCircle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         preferenceManager = new PreferenceManager(this);
+        thumb_image = preferenceManager.getString(Constants.KEY_THUMB_IMAGE);
+        Log.e(TAG, "onCreate: thumb_image: " + thumb_image);
+        fragment = HomeFeedFragment.newInstance();
+        topLayoutTv = findViewById(R.id.home_toplayouttv);
+        homeIcon = findViewById(R.id.home_homeicon);
+        searchIcon = findViewById(R.id.home_searchicon);
+        addIcon = findViewById(R.id.home_addicon);
+        bookmarkIcon = findViewById(R.id.home_bookmarkicon);
+        profileIcon = findViewById(R.id.home_accounticon);
+        profileCircle = findViewById(R.id.home_circleoutline);
 
-        token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
-        uid = preferenceManager.getString(Constants.KEY_UID);
-        fullName = preferenceManager.getString(Constants.KEY_FUll_NAME);
+        profileCircle.setVisibility(View.GONE);
 
-        //test for values
-        Log.e(TAG, "onCreate: full name:  " + fullName);
-        Log.e(TAG, "onCreate: uid: " + uid);
-        Log.e(TAG, "onCreate: token: " + token);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.home_fragment, fragment)
+                .commit();
+        homeIcon.setColorFilter(Color.BLACK);
 
-        finalList = new ArrayList<>();
-        callApi(pageCount);
-        // Log.e(TAG, "onResponse: finalList" + finalList);
-        recyclerViewInit();
+        Glide.with(this).load(thumb_image).into(profileIcon);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        homeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            public void onClick(View view) {
+                topLayoutTv.setText("Home Feed");
+                profileCircle.setVisibility(View.GONE);
+                homeIcon.setColorFilter(Color.BLACK);
+                searchIcon.clearColorFilter();
+                //profileIcon.clearColorFilter();
+                bookmarkIcon.clearColorFilter();
 
-                if (!recyclerView.canScrollVertically(1)) {
-                    //Toast.makeText(MainActivity.this, "end of the list", Toast.LENGTH_SHORT).show();
-                    pageCount = pageCount + 1;
-                    if (!noMoreResults) {
-                        callApi(pageCount);
-                    } else {
-                        if (!listEnd) {
-                            Toast.makeText(MainActivity.this, "No more posts", Toast.LENGTH_SHORT).show();
-                            listEnd = true;
-                        }
-                    }
-                }
+                fragment = HomeFeedFragment.newInstance();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.home_fragment, fragment)
+                        .commit();
             }
         });
-    }
 
-    private void callApi(int pageNo) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
-
-        APIInterface jsonHomeFeedApi = retrofit.create(APIInterface.class);
-
-        Call<List<HomeFeed>> listCall = jsonHomeFeedApi.getHomeFeed("bearer " + token, pageNo);
-
-        listCall.enqueue(new Callback<List<HomeFeed>>() {
+        searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<List<HomeFeed>> call, Response<List<HomeFeed>> response) {
-               /*if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: code " + response.code());
-                }
-*/
-                //List<HomeFeed> homeFeeds = response.body();
-               /* if (homeFeeds!=null){
-                    finalList.addAll(homeFeeds);
-                    homeRecyclerAdapter.notifyDataSetChanged();
-                }
-                else{
-                    Toast.makeText(MainActivity.this, "no post", Toast.LENGTH_SHORT).show();
-                }
-*/
-                Log.e(TAG, "onResponse: final" + finalList);
+            public void onClick(View view) {
+                topLayoutTv.setText("Explore");
+                profileCircle.setVisibility(View.GONE);
+                searchIcon.setColorFilter(Color.BLACK);
+                homeIcon.clearColorFilter();
+                bookmarkIcon.clearColorFilter();
 
-                if (response.body() == null) {
-                    Log.e(TAG, "onResponse: errr:  " + response.body());
-                    //Log.e(TAG, "onResponse: errr: + "+response.body() );
-                    noMoreResults = true;
-                }else {
-                    List<HomeFeed> homeFeeds = response.body();
-                    finalList.addAll(homeFeeds);
-                    homeRecyclerAdapter.notifyDataSetChanged();
-                    Log.e(TAG, "onResponse: final" + finalList);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<HomeFeed>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Check Your Internet Connection ", Toast.LENGTH_SHORT).show();
+                fragment = SearchFragment.newInstance();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null)
+                        .replace(R.id.home_fragment, fragment)
+                        .commit();
             }
         });
-    }
 
-    private void recyclerViewInit() {
-        homeRecyclerAdapter = new homeRecyclerAdapter(this, finalList);
-        recyclerView = findViewById(R.id.home_recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(homeRecyclerAdapter);
+        profileIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                topLayoutTv.setText("Account");
+                profileCircle.setVisibility(View.VISIBLE);
+                searchIcon.clearColorFilter();
+                homeIcon.clearColorFilter();
+                bookmarkIcon.clearColorFilter();
+
+                fragment = ProfileFragment.newInstance();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+            }
+        });
+
+        bookmarkIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                topLayoutTv.setText("Bookmarks");
+                profileCircle.setVisibility(View.GONE);
+                bookmarkIcon.setColorFilter(Color.BLACK);
+                searchIcon.clearColorFilter();
+                homeIcon.clearColorFilter();
+
+                fragment = BookmarksFragment.newInstance();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+
+            }
+        });
+
     }
 }

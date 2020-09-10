@@ -164,7 +164,12 @@ app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
 
 			}
 			else{
-				console.log('error in register:  ',err);
+					if(err.code == 'ER_DUP_ENTRY'){
+						res.status(406).send();
+						console.log('error in register:  ',err.code);
+					}
+					console.log('error while register:  ',err)
+				
 			}
 		} )
 	
@@ -188,13 +193,36 @@ app.get('/post',(req,res)=>{
 });
 
  //get all posts of a user
-app.get('/post/:uid',(req,res)=>{
-	mysqlConnection.query('SELECT * FROM post where uid= ? ',[req.params.uid],(err,rows,fields)=>{
-		if(!err)
-			res.send(rows);
-		else
-			console.log(err);
-	})
+app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
+
+	jwt.verify(req.token ,SecretKey, async function(err,authData){
+	if(!!err){
+		res.sendStatus(400);
+	}
+	else{
+		const auth_uid= authData.user.id;
+		if(auth_uid==req.params.uid){
+			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? ',[req.params.uid],(err,rows,fields)=>{
+				if(!err){
+					console.log('account posts retireve successfully');
+					res.send(rows);
+				}
+				else{
+					console.log(err);
+
+				}
+			})
+		}
+		else{
+			console.log('User not authorized');
+		}
+	
+	}
+
+
+
+})
+	
 });
 
 
@@ -219,7 +247,7 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 				end_limit=start_limit + 5;
 			}
 			
-			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY time_stamp desc )limit ?,?',[uid,uid,start_limit,end_limit],(err,rows,fields)=>{
+			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,end_limit],(err,rows,fields)=>{
 				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
 					//No more posts
 					console.log('uid passed with error:  ',uid);

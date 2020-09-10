@@ -1,5 +1,6 @@
 package com.bcabuddies.blogair.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,10 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.utils.TimeAgo;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bumptech.glide.Glide;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -25,6 +29,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     private Context context;
     private List<HomeFeed> homeFeedList = new ArrayList<>();
     private static final String TAG = "homeRecyclerAdapter";
+
 
     public homeRecyclerAdapter(Context context, List<HomeFeed> homeFeedList) {
         Log.e(TAG, "homeRecyclerAdapter: homefeedList" + homeFeedList);
@@ -42,6 +47,9 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     @Override
     public void onBindViewHolder(@NonNull homeFeedViewHolder holder, int position) {
 
+        String pid= homeFeedList.get(position).getPid();
+        Date timeStamp = homeFeedList.get(position).getTime_stamp();
+
         Glide.with(context)
                 .load(homeFeedList.get(position).getThumb_image())
                 .into(holder.userThumb);
@@ -52,6 +60,20 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         holder.likesCount.setText(String.valueOf(homeFeedList.get(position).getLikes_count()));
         holder.postDesc.setText(homeFeedList.get(position).getDesc());
         holder.postHeading.setText(homeFeedList.get(position).getPost_heading());
+
+        //set time stamp
+        long timeInMili = timeStamp.getTime();
+        String timeAgo = TimeAgo.getTimeAgo(timeInMili);
+        if (timeAgo == "ADD_DATE"){
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMM yy");
+            final StringBuilder nowMMDDYYYY = new StringBuilder(dateformatMMDDYYYY.format(timeStamp));
+            holder.timeStamp.setText(nowMMDDYYYY.toString());
+        }
+        else{
+            holder.timeStamp.setText(timeAgo);
+        }
+
+        
 
     }
 
@@ -74,7 +96,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
         ImageView dotsMenu, postImage, likeIcon, commentsIcon;
         CircleImageView userThumb;
-        TextView fullName, likesCount, postHeading, postDesc;
+        TextView fullName, likesCount, postHeading, postDesc,timeStamp;
 
         public homeFeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -88,6 +110,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             likesCount = itemView.findViewById(R.id.homerow_like_count);
             postHeading = itemView.findViewById(R.id.homerow_postheading);
             postDesc = itemView.findViewById(R.id.homerow_post_desc);
+            timeStamp=itemView.findViewById(R.id.homerow_timestamp);
         }
     }
 

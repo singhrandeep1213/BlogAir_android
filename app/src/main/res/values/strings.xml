@@ -14,4 +14,9 @@
     <string name="comments">comments</string>
     <string name="username">Username</string>
     <string name="sample_post_desc">This is sample post description</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_content">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</string>
+    <string name="more"><u>...more</u></string>
+    <string name="less"><u>...less</u></string>
 </resources>

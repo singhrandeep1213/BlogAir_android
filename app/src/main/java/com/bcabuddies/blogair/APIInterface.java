@@ -3,6 +3,7 @@ package com.bcabuddies.blogair;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
 import com.bcabuddies.blogair.model.LoginUser;
+import com.bcabuddies.blogair.model.UserPosts;
 import com.bcabuddies.blogair.utils.Constants;
 
 import java.util.List;
@@ -36,6 +37,10 @@ public interface APIInterface {
     @FormUrlEncoded
     Call<LoginToken> getToken(@Field("email_id") String email_id, @Field("password") String password);
 
+    //get all posts of the current logged in user (user profile)
+    @Headers(Constants.KEY_HEADER)
+    @GET("/user/profile/posts/{uid}")
+    Call<List<UserPosts>> getUserPosts(@Header("authorization") String token, @Path("uid") String uid);
 
 /*
     //test jwt auth token

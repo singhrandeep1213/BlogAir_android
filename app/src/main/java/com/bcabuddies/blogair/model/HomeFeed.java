@@ -1,5 +1,7 @@
 package com.bcabuddies.blogair.model;
 
+import java.util.Date;
+
 public class HomeFeed {
 
 
@@ -9,11 +11,11 @@ public class HomeFeed {
     String desc;
     String post_image;
     int likes_count;
-    String time_stamp;
+    Date time_stamp;
     String uid;
     String post_heading;
 
-    public HomeFeed(String full_name, String thumb_image, String pid, String desc, String post_image, int likes_count, String time_stamp, String uid, String post_heading) {
+    public HomeFeed(String full_name, String thumb_image, String pid, String desc, String post_image, int likes_count, Date time_stamp, String uid, String post_heading) {
         this.full_name = full_name;
         this.thumb_image = thumb_image;
         this.pid = pid;
@@ -81,11 +83,11 @@ public class HomeFeed {
         this.likes_count = likes_count;
     }
 
-    public String getTime_stamp() {
+    public Date getTime_stamp() {
         return time_stamp;
     }
 
-    public void setTime_stamp(String time_stamp) {
+    public void setTime_stamp(Date time_stamp) {
         this.time_stamp = time_stamp;
     }
 

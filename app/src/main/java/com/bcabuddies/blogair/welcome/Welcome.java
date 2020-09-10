@@ -3,6 +3,7 @@ package com.bcabuddies.blogair.welcome;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -36,13 +37,42 @@ public class Welcome extends AppCompatActivity {
     PreferenceManager preferenceManager;
     private static final String TAG = "Welcome";
     String initialToken;
+    int page=0;
+    private Handler handler;
+    private int delay = 1500;
+    WelcomeViewPagerAdapter welcomeViewPagerAdapter;
+
+    Runnable runnable =new Runnable() {
+        @Override
+        public void run() {
+            if(welcomeViewPagerAdapter.getCount()==page){
+                page=0;
+            }else{
+                page++;
+            }
+            welcomeViewPager.setCurrentItem(page,true);
+            handler.postDelayed(this,delay);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        handler.postDelayed(runnable, delay);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(runnable);
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-
+        handler = new Handler();
         preferenceManager = new PreferenceManager(this);
         initialToken=preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         Log.e(TAG, "onCreate: initial token:   "+initialToken  );
@@ -82,9 +112,29 @@ public class Welcome extends AppCompatActivity {
         //viewpager
         viewPagerImageList = new ArrayList<>();
         addImageData();
-        WelcomeViewPagerAdapter welcomeViewPagerAdapter = new WelcomeViewPagerAdapter(viewPagerImageList, this);
+        welcomeViewPagerAdapter = new WelcomeViewPagerAdapter(viewPagerImageList, this);
         welcomeViewPager.setAdapter(welcomeViewPagerAdapter);
         welcomeTabLayout.setupWithViewPager(welcomeViewPager);
+
+        welcomeViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                page=position;
+                Log.e(TAG, "onPageSelected: "+position );
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
     }
 
 

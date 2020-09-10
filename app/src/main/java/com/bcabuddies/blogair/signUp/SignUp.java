@@ -39,6 +39,7 @@ public class SignUp extends AppCompatActivity {
     String loginToken = "", thumb_image="";
     PreferenceManager preferenceManager;
     ImageView backBtn;
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
 
     @Override
@@ -54,6 +55,7 @@ public class SignUp extends AppCompatActivity {
         createAccountButton = findViewById(R.id.signup_createbtn);
         backBtn=findViewById(R.id.signup_backbtn);
         preferenceManager=new PreferenceManager(getApplicationContext());
+
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,11 +82,18 @@ public class SignUp extends AppCompatActivity {
                 confirmPassword = cpass.getEditText().getText().toString();
                 uid = UUID.randomUUID().toString();
 
-                if (!password.equals(confirmPassword)) {
-                    Toast.makeText(SignUp.this, "Password does not match", Toast.LENGTH_SHORT).show();
-                } else {
-                    callApi();
+                if (emailId.equals("")|| emailId.equals(null) || fullName.equals("") ||fullName.equals(null) || password.equals("") || password.equals(null) || confirmPassword.equals("")||confirmPassword.equals(null)){
+                    Toast.makeText(SignUp.this, "Please fill all the details", Toast.LENGTH_SHORT).show();
+                }else {
+                    if (!password.equals(confirmPassword)) {
+                        Toast.makeText(SignUp.this, "Password does not match", Toast.LENGTH_SHORT).show();
+                    } else if (!(emailId.matches(emailPattern)) && password.equals(confirmPassword)){
+                        Toast.makeText(SignUp.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+                    }else{
+                        callApi();
+                    }
                 }
+
             }
         });
     }
@@ -99,28 +108,31 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginToken> call, Response<LoginToken> response) {
                 if (!response.isSuccessful()) {
-                    Toast.makeText(SignUp.this, "Failed to register", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "onResponse: register  error code :  " + response.code());
+                  //  Toast.makeText(SignUp.this, "Failed to register", Toast.LENGTH_SHORT).show();
+                   // Log.e(TAG, "onResponse: register  error code :  " + response.code());
+                    if (response.code()==406) {
+                        Toast.makeText(SignUp.this, "User already exist. Try forgot password", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "User Already exist " + response.body());
+                    }
                 }
-
-                loginToken=response.body().getToken();
-                thumb_image=response.body().getThumb_image();
-                preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
-                preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
-                preferenceManager.saveString(Constants.KEY_UID, uid);
-                Log.e(TAG, "onResponse: reg token:  "+loginToken);
-                startActivity(new Intent(SignUp.this, MainActivity.class));
-                SignUp.this.finish();
+                 else {
+                    loginToken = response.body().getToken();
+                    thumb_image = response.body().getThumb_image();
+                    preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
+                    preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
+                    preferenceManager.saveString(Constants.KEY_UID, uid);
+                    preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumb_image);
+                    Log.e(TAG, "onResponse: reg token:  " + loginToken);
+                    startActivity(new Intent(SignUp.this, MainActivity.class));
+                    SignUp.this.finish();
+                }
             }
 
             @Override
             public void onFailure(Call<LoginToken> call, Throwable t) {
-
+                Toast.makeText(SignUp.this, "Check your internet connection", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onFailure: onreg failure msg :  "+t.getMessage());
             }
         });
-
-
     }
-
-
 }
