@@ -1,5 +1,6 @@
 package com.bcabuddies.blogair.home;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,6 +57,13 @@ public class MainActivity extends AppCompatActivity {
         homeIcon.setColorFilter(Color.BLACK);
 
         Glide.with(this).load(thumb_image).into(profileIcon);
+
+        addIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, AddPost.class));
+            }
+        });
 
         homeIcon.setOnClickListener(new View.OnClickListener() {
             @Override

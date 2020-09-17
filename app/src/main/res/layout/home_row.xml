@@ -56,11 +56,11 @@
 
     <ImageView
         android:id="@+id/homerow_post_image"
-        android:layout_width="414dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:contentDescription="@string/post_image"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:src="@drawable/default_post_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -112,6 +112,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginEnd="5dp"
         android:text="Post Heading"
+        android:maxLines="2"
         android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -120,16 +121,58 @@
 
     <TextView
         android:id="@+id/homerow_post_desc"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:maxLines="3"
+        android:maxLines="4"
+        android:textColor="#000000"
         android:text="@string/sample_post_desc"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/homerow_postheading"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/homerow_postheading" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/homerow_post_desc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="10dp"
+        >
+        <TextView
+            android:id="@+id/homerow_moretv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/more"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="#000000"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/homerow_lesstv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/less"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textColor="#000000"
+            android:layout_marginStart="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

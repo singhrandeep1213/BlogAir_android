@@ -6,23 +6,41 @@ const SecretKey ='K27eEaz9sKC7cFnIBjxY4i0tucCTdmgN6Oe-iMv7Lsjcu0wo_coM_tnYekUM8H
 const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9RahulGaurqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvRGjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcL22";
 const bodyparser=require('body-parser');
 var multer  = require('multer');
-const verify = require('jsonwebtoken/verify');
 var upload = multer();
 var uuid=require('uuid');
+const path = require('path');
+const fileSys = require('fs');
 
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 
+//const baseURL = 'https://myblogs.harshitaapptech.com/myblog/api/v3'; //live
+const baseURL = 'http://192.168.1.3:3000'; //local
 
-
+//databse connection
 var mysqlConnection= mysql.createConnection({
 	host:'localhost',
 	user:'root',
 	password:'',
-	database:'blogair_db'
-	
+	database:'blogair_db',
+	charset : 'utf8mb4'
 });
+
+//post imgae storage
+var storageProfile = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/post_images');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname  + uuid.v4() +
+            path.extname(file.originalname));
+    }
+});
+
+const uploadPostImage = multer({
+	 storage: storageProfile 
+	});
 
 //connect to database
 mysqlConnection.connect((err)=>{
@@ -97,6 +115,37 @@ app.post('/user',(req,res)=>{
 				console.log(err);
 	})
 });
+
+//add new post
+app.post('/user/post/addnew',verifyHeader,verifyToken,  uploadPostImage.single('post_image'),  async(req,res)=>{
+
+	jwt.verify(req.token, SecretKey,async function(err,authData){
+		if (!!err) {
+			console.log('error in posting:  ',err);
+			res.sendStatus(401);
+		}
+		else{
+			var data =req.body;
+			var pid= data.pid;
+			var post_desc= data.post_desc;
+			var post_image_url=req.file.filename;
+			var uid = authData.user.id;
+			var post_heading = data.post_heading;
+			console.log('post_imge_url:   ',post_image_url);
+			console.log('error in else:  ',err);
+			uploadPost(pid,post_desc,post_image_url,uid,post_heading).then(function (result){
+
+				res.status(200).send(result);
+
+			}).catch(function(error){	
+				console.log("Promise Rejected ", error);
+                res.status(400).send("Error " + error);
+			});	
+		}
+	});
+});
+
+
 
 //register a user pass full_name, email_id, password, uid
 app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
@@ -192,18 +241,30 @@ app.get('/post',(req,res)=>{
 	})
 });
 
- //get all posts of a user
+
+
+ //get all posts of a user (i.e. user profile)
 app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
 
 	jwt.verify(req.token ,SecretKey, async function(err,authData){
 	if(!!err){
-		res.sendStatus(400);
+		res.sendStatus(401);
 	}
 	else{
+		var token=req.token;
 		const auth_uid= authData.user.id;
 		if(auth_uid==req.params.uid){
 			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? ',[req.params.uid],(err,rows,fields)=>{
 				if(!err){
+					
+					Object.keys(rows).forEach(key => {
+						var singlePost=rows[key]
+						if (rows[key].post_image != null) {
+							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
+							console.log('post image:   ', rows[key].post_image);
+						}
+					
+					});
 					console.log('account posts retireve successfully');
 					res.send(rows);
 				}
@@ -235,28 +296,40 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 		}
 		else{
 			const uid=authData.user.id;
-			var start_limit;
-			var end_limit;
+			var start_limit=0;
+			var data_limit=5;
 			var page_no=req.params.page_no;
+			var token=req.token;
 		
 			if(page_no==1){
 				start_limit=0;
-				end_limit=5;
+				
 			}else{
-				start_limit=(page_no -1 ) * 5;
-				end_limit=start_limit + 5;
+				start_limit=(page_no - 1) * 5 ; 
 			}
 			
-			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,end_limit],(err,rows,fields)=>{
+			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,data_limit],(err,rows,fields)=>{
 				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
 					//No more posts
 					console.log('uid passed with error:  ',uid);
 					console.log('page_no passed with error:  ',page_no);
-
 					console.log('Error while getting posts: ', err);
 					res.json(null);
 				}
 				else{
+
+					Object.keys(rows).forEach(key => {
+						var singlePost=rows[key]
+						if (rows[key].post_image != null) {
+							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
+							console.log('post image:   ', rows[key].post_image);
+						}
+					
+					});
+
+					
+
+
 					console.log('uid passed: ',uid);
 					res.status(200).send(rows);
 				}
@@ -265,6 +338,48 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 	})
 });
 
+
+//get single image url
+app.get('/post/image/:token/:image_id', function(req,res){
+
+	console.log('get worked');
+	
+	var token =req.params.token;
+	console.log('token:  ',token);
+	
+	jwt.verify(token, SecretKey , (err,authData) => {
+		if(!!err){
+			console.log('user not verified ')
+			res.sendStatus(401);
+		}
+		else{
+			//user is verified
+			var image_id = req.params.image_id;
+			console.log('image id:  ',image_id);
+			//return image file using file name present in database
+
+			//change this when live
+			//var filepath = __dirname + "/public/post_images/" + image_id;
+			var filepath= 'D:/Android/BlogAir/api/user/public/post_images/' + image_id;
+			console.log('filepath:  ',filepath);
+			try{
+				if(fileSys.existsSync(filepath)){
+					res.sendFile(filepath);
+				}
+				else{
+					console.log('error in if:  ');
+					res.sendStatus(404);
+				}
+			}catch(err){
+				console.log('getting error in try:  ',err);
+				res.sendStatus(404);
+			}
+		}
+		
+
+	})
+
+})
 
 
 
@@ -438,4 +553,33 @@ function verifyToken(req, res, next) {
         // forbidden
         res.sendStatus(403).send();
     }
+}
+
+
+//upload image function
+async function uploadPost(pid,post_desc,post_image_url,uid,post_heading){
+
+	return new Promise(function(resolve,reject){
+
+		mysqlConnection.query('INSERT INTO `post` (`pid`, `desc`, `post_image`, `uid`, `post_heading`) VALUES (?,?,?,?,?);' ,[pid,post_desc,post_image_url,uid,post_heading], async function(err,rows){
+			if (!err) {
+				var obj = {
+					error: false,
+					message: "Success"
+				}
+				resolve(obj);
+			}
+			else{
+				var obj = {
+					error: true,
+					message: "Error: " + err
+				}
+				reject(obj);
+			
+			}
+
+		});
+
+	});
+
 }

@@ -65,7 +65,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         long timeInMili = timeStamp.getTime();
         String timeAgo = TimeAgo.getTimeAgo(timeInMili);
         if (timeAgo == "ADD_DATE"){
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMM yy");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMMM" + ", "+"EEE");
             final StringBuilder nowMMDDYYYY = new StringBuilder(dateformatMMDDYYYY.format(timeStamp));
             holder.timeStamp.setText(nowMMDDYYYY.toString());
         }
@@ -73,7 +73,33 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             holder.timeStamp.setText(timeAgo);
         }
 
-        
+        holder.postDesc.post(new Runnable() {
+            @Override
+            public void run() {
+                int num=holder.postDesc.getLineCount();
+                if (num > 4 ){
+                    holder.moreTv.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        holder.moreTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.moreTv.setVisibility(View.GONE);
+                holder.lessTv.setVisibility(View.VISIBLE);
+                holder.postDesc.setMaxLines(Integer.MAX_VALUE);
+            }
+        });
+
+        holder.lessTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.lessTv.setVisibility(View.GONE);
+                holder.moreTv.setVisibility(View.VISIBLE);
+                holder.postDesc.setMaxLines(4);
+            }
+        });
 
     }
 
@@ -96,7 +122,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
         ImageView dotsMenu, postImage, likeIcon, commentsIcon;
         CircleImageView userThumb;
-        TextView fullName, likesCount, postHeading, postDesc,timeStamp;
+        TextView fullName, likesCount, postHeading, postDesc,timeStamp,moreTv,lessTv;
 
         public homeFeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -111,6 +137,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             postHeading = itemView.findViewById(R.id.homerow_postheading);
             postDesc = itemView.findViewById(R.id.homerow_post_desc);
             timeStamp=itemView.findViewById(R.id.homerow_timestamp);
+            moreTv=itemView.findViewById(R.id.homerow_moretv);
+            lessTv=itemView.findViewById(R.id.homerow_lesstv);
         }
     }
 
