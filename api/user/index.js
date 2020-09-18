@@ -16,7 +16,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 
 //const baseURL = 'https://myblogs.harshitaapptech.com/myblog/api/v3'; //live
-const baseURL = 'http://192.168.1.3:3000'; //local
+const baseURL = 'http://192.168.1.6:3000'; //local
 
 //databse connection
 var mysqlConnection= mysql.createConnection({
@@ -360,7 +360,7 @@ app.get('/post/image/:token/:image_id', function(req,res){
 
 			//change this when live
 			//var filepath = __dirname + "/public/post_images/" + image_id;
-			var filepath= 'D:/Android/BlogAir/api/user/public/post_images/' + image_id;
+			var filepath= 'D:/work/Android/BlogAir/api/user/public/post_images/' + image_id;
 			console.log('filepath:  ',filepath);
 			try{
 				if(fileSys.existsSync(filepath)){
