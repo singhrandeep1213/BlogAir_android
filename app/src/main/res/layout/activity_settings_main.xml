@@ -7,7 +7,7 @@
     tools:context="com.bcabuddies.blogair.settings.SettingsMain">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/settings_toplayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#EDEDED"
@@ -17,7 +17,8 @@
 
 
         <ImageView
-            android:id="@+id/imageView"
+            android:tint="#000000"
+            android:id="@+id/settings_backicon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
@@ -35,7 +36,7 @@
             android:textColor="#000000"
             android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
+            app:layout_constraintStart_toEndOf="@+id/settings_backicon"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -48,9 +49,10 @@
         android:layout_marginTop="10dp"
         android:src="@drawable/account_icon"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/settings_toplayout" />
 
     <TextView
+        android:id="@+id/settings_fullnameTv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -112,7 +114,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_forgorpasslayout"
+        android:id="@+id/settings_changepasslayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -157,7 +159,7 @@
         android:background="@drawable/input_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_forgorpasslayout">
+        app:layout_constraintTop_toBottomOf="@+id/settings_changepasslayout">
 
         <TextView
             android:layout_width="wrap_content"
@@ -186,7 +188,7 @@
 
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/settings_appTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -198,6 +200,7 @@
         app:layout_constraintTop_toBottomOf="@+id/settings_blockeduserlayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_darkmodelayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -206,7 +209,7 @@
         android:background="@drawable/input_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9">
+        app:layout_constraintTop_toBottomOf="@+id/settings_appTv">
 
 
         <Switch

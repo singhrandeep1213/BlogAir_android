@@ -109,7 +109,8 @@
                 android:paddingStart="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/addpost_desctv"

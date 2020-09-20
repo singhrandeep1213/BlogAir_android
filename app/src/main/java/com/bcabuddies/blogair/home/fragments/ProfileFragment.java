@@ -67,7 +67,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void run() {
                 int num = userBio.getLineCount();
-                if (num > 4) {
+                if (num > 2) {
                     userBioMore.setVisibility(View.VISIBLE);
                 }
                 Log.e(TAG, "onCreateView: line count:  " + num);
@@ -89,7 +89,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 userBioLess.setVisibility(View.GONE);
                 userBioMore.setVisibility(View.VISIBLE);
-                userBio.setMaxLines(4);
+                userBio.setMaxLines(2);
             }
         });
 
