@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -173,6 +174,29 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageView
+        android:id="@+id/homerow_bookmarkunselected"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/homerow_postheading"
+        app:layout_constraintEnd_toStartOf="@+id/homerow_comments_icon"
+        app:layout_constraintTop_toBottomOf="@+id/homerow_post_image"
+        app:srcCompat="@drawable/bookmark_unselected_icon"
+        android:padding="5dp"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/homerow_bookmarkselected"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginEnd="5dp"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/homerow_postheading"
+        app:layout_constraintEnd_toStartOf="@+id/homerow_comments_icon"
+        app:layout_constraintTop_toBottomOf="@+id/homerow_post_image"
+        app:srcCompat="@drawable/bookmark_selected_icon"
+        android:visibility="gone"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

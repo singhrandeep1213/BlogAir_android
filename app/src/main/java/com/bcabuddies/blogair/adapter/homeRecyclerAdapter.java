@@ -27,12 +27,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapter.homeFeedViewHolder> {
 
     private Context context;
-    private List<HomeFeed> homeFeedList = new ArrayList<>();
+    private List<HomeFeed.Post> homeFeedList = new ArrayList<>();
     private static final String TAG = "homeRecyclerAdapter";
 
 
-    public homeRecyclerAdapter(Context context, List<HomeFeed> homeFeedList) {
-        Log.e(TAG, "homeRecyclerAdapter: homefeedList" + homeFeedList);
+    public homeRecyclerAdapter(Context context, List<HomeFeed.Post> homeFeedList) {
         this.context = context;
         this.homeFeedList = homeFeedList;
     }
@@ -48,6 +47,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     public void onBindViewHolder(@NonNull homeFeedViewHolder holder, int position) {
 
         String pid= homeFeedList.get(position).getPid();
+        String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
 
         Glide.with(context)
@@ -61,6 +61,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         holder.postDesc.setText(homeFeedList.get(position).getDesc());
         holder.postHeading.setText(homeFeedList.get(position).getPost_heading());
 
+        Log.e(TAG, "onBindViewHolder: pid: "+pid + "  is_bookmarked:  "+is_bookmarked);
+
         //set time stamp
         long timeInMili = timeStamp.getTime();
         String timeAgo = TimeAgo.getTimeAgo(timeInMili);
@@ -73,6 +75,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             holder.timeStamp.setText(timeAgo);
         }
 
+        //set more and less view
         holder.postDesc.post(new Runnable() {
             @Override
             public void run() {
@@ -82,7 +85,6 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 }
             }
         });
-
         holder.moreTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,7 +93,6 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 holder.postDesc.setMaxLines(Integer.MAX_VALUE);
             }
         });
-
         holder.lessTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +101,15 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 holder.postDesc.setMaxLines(4);
             }
         });
+
+        //set bookmark icon
+        if (is_bookmarked.equals("1")){
+            holder.bookmarkSelectedIcon.setVisibility(View.VISIBLE);
+            holder.bookmarkUnselectedIcon.setVisibility(View.GONE);
+        }else if (is_bookmarked.equals("0")){
+            holder.bookmarkUnselectedIcon.setVisibility(View.VISIBLE);
+            holder.bookmarkSelectedIcon.setVisibility(View.GONE);
+        }
 
     }
 
@@ -120,7 +130,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
     class homeFeedViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView dotsMenu, postImage, likeIcon, commentsIcon;
+        ImageView dotsMenu, postImage, likeIcon, commentsIcon,bookmarkSelectedIcon, bookmarkUnselectedIcon;
         CircleImageView userThumb;
         TextView fullName, likesCount, postHeading, postDesc,timeStamp,moreTv,lessTv;
 
@@ -139,6 +149,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             timeStamp=itemView.findViewById(R.id.homerow_timestamp);
             moreTv=itemView.findViewById(R.id.homerow_moretv);
             lessTv=itemView.findViewById(R.id.homerow_lesstv);
+            bookmarkUnselectedIcon=itemView.findViewById(R.id.homerow_bookmarkunselected);
+            bookmarkSelectedIcon=itemView.findViewById(R.id.homerow_bookmarkselected);
         }
     }
 

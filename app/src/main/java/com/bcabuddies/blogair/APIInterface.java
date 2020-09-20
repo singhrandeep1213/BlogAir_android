@@ -34,7 +34,7 @@ public interface APIInterface {
     //Get home feed of logged in user
     @Headers(Constants.KEY_HEADER)
     @GET("/user/homeFeed/{page_no}")
-    Call<List<HomeFeed>> getHomeFeed(@Header("authorization") String token, @Path("page_no") int page_no);
+    Call<HomeFeed> getHomeFeed(@Header("authorization") String token, @Path("page_no") int page_no);
 
     //get jwt token with email_id and password
     @Headers(Constants.KEY_HEADER)

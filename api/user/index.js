@@ -300,6 +300,7 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 			var data_limit=5;
 			var page_no=req.params.page_no;
 			var token=req.token;
+			var allBlogs=[];
 		
 			if(page_no==1){
 				start_limit=0;
@@ -311,27 +312,72 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,data_limit],(err,rows,fields)=>{
 				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
 					//No more posts
-					console.log('uid passed with error:  ',uid);
-					console.log('page_no passed with error:  ',page_no);
 					console.log('Error while getting posts: ', err);
-					res.json(null);
+					var obj = {
+						message: "Posts_not_found",
+						error: true,
+						blog: []
+					}
+
+					res.status(200).send(obj)
 				}
 				else{
+
+					var allPosts = []
+                	var counter = 0;
+                   	var exitCondition = rows.length - 1
 
 					Object.keys(rows).forEach(key => {
 						var singlePost=rows[key]
 						if (rows[key].post_image != null) {
 							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
-							console.log('post image:   ', rows[key].post_image);
+							//console.log('post image:   ', rows[key].post_image);
 						}
-					
+						current_pid= singlePost.pid;
+						//console.log('current_pid:  ', rows[key].pid);
+						//check if current user has bookmarked the post
+						mysqlConnection.query('select count(bid) as is_bookmarked from bookmarks where uid = ? and pid = ?',[uid,current_pid], function(err,result) {
+							if (!!err){
+								//console.log('Error getting bookmarks:  ',err);
+								var obj = {
+									message: "Posts found",
+									error: false,
+									blog: allPosts
+								}
+
+								res.status(200).send(obj)
+							}
+							else{
+								var is_bookmarked = result[0].is_bookmarked;
+								//console.log('bookmark id:  ', is_bookmarked);
+								singlePost.is_bookmarked=is_bookmarked;
+
+								allBlogs.push(singlePost);
+
+								var obj = {
+									message: "Posts found",
+									error: false,
+									post: allBlogs
+								}
+
+								if (counter == exitCondition) {
+									res.status(200).send(obj);
+								}
+								counter++;
+								
+								//console.log('singlePost:  ',singlePost);
+								//console.log('rows:  ',rows);
+								
+							}
+							
+						})
+						
 					});
-
+					//console.log('allblogs: ', allBlogs);
+					//res.status(200).send(rows);
+					//console.log('uid passed: ',uid);
+					//console.log('rows:  ',rows);
 					
-
-
-					console.log('uid passed: ',uid);
-					res.status(200).send(rows);
 				}
 			})
 		}

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
+import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
@@ -38,7 +39,7 @@ public class HomeFeedFragment extends Fragment {
     private RecyclerView recyclerView;
     private com.bcabuddies.blogair.adapter.homeRecyclerAdapter homeRecyclerAdapter;
     private static final String TAG = "HomeFeed";
-    List<com.bcabuddies.blogair.model.HomeFeed> finalList;
+    List<com.bcabuddies.blogair.model.HomeFeed.Post> finalList;
     PreferenceManager preferenceManager;
     String token, uid, fullName;
     int pageCount = 1;
@@ -101,43 +102,42 @@ public class HomeFeedFragment extends Fragment {
 
         APIInterface jsonHomeFeedApi = retrofit.create(APIInterface.class);
 
-        Call<List<com.bcabuddies.blogair.model.HomeFeed>> listCall = jsonHomeFeedApi.getHomeFeed("bearer " + token, pageNo);
+        Call<HomeFeed> listCall = jsonHomeFeedApi.getHomeFeed("bearer " + token, pageNo);
 
-        listCall.enqueue(new Callback<List<com.bcabuddies.blogair.model.HomeFeed>>() {
-            @Override
-            public void onResponse(Call<List<com.bcabuddies.blogair.model.HomeFeed>> call, Response<List<com.bcabuddies.blogair.model.HomeFeed>> response) {
-               /*if (!response.isSuccessful()) {
+       listCall.enqueue(new Callback<HomeFeed>() {
+           @Override
+           public void onResponse(Call<HomeFeed> call, Response<HomeFeed> response) {
+               if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: code " + response.code());
-                }
-*/
-                //List<HomeFeed> homeFeeds = response.body();
-               /* if (homeFeeds!=null){
-                    finalList.addAll(homeFeeds);
-                    homeRecyclerAdapter.notifyDataSetChanged();
-                }
-                else{
-                    Toast.makeText(MainActivity.this, "no post", Toast.LENGTH_SHORT).show();
-                }
-*/
-                Log.e(TAG, "onResponse: final" + finalList);
+                   Log.e(TAG, "onResponse: errr:  " + response.body());
+                   //Log.e(TAG, "onResponse: errr: + "+response.body() );
+                   noMoreResults = true;
+               }
 
-                if (response.body() == null) {
-                    Log.e(TAG, "onResponse: errr:  " + response.body());
-                    //Log.e(TAG, "onResponse: errr: + "+response.body() );
-                    noMoreResults = true;
-                } else {
-                    List<com.bcabuddies.blogair.model.HomeFeed> homeFeeds = response.body();
-                    finalList.addAll(homeFeeds);
-                    homeRecyclerAdapter.notifyDataSetChanged();
-                    Log.e(TAG, "onResponse: final" + finalList);
-                }
-            }
+               if  (response.message().equals("Posts_not_found")){
+                   Log.e(TAG, "onResponse: Posts_not_found" );
+               }
+               else {
+                   if (response.body().getPost()!=null){
+                       List<com.bcabuddies.blogair.model.HomeFeed.Post> homeFeeds = response.body().getPost();
+                       finalList.addAll(homeFeeds);
+                       homeRecyclerAdapter.notifyDataSetChanged();
+                       Log.e(TAG, "onResponse: final" + finalList);
+                   }
+                   else{
+                       noMoreResults = true;
+                   }
+               }
+           }
 
-            @Override
-            public void onFailure(Call<List<com.bcabuddies.blogair.model.HomeFeed>> call, Throwable t) {
-                Toast.makeText(getActivity().getApplicationContext(), "Check Your Internet Connection ", Toast.LENGTH_SHORT).show();
-            }
-        });
+           @Override
+           public void onFailure(Call<HomeFeed> call, Throwable t) {
+               Log.e(TAG, "onFailure: "+t.getMessage() );
+           }
+       });
+
+
+
     }
 
     private void recyclerViewInit(View mView) {
