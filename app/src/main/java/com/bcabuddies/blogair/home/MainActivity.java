@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     TextView topLayoutTv;
     PreferenceManager preferenceManager;
     String thumb_image;
-    ImageView homeIcon, searchIcon, addIcon, bookmarkIcon;
+    ImageView homeIcon, searchIcon, addIcon, bookmarkIcon, settingsIcon;
     CircleImageView profileIcon, profileCircle;
 
     @Override
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         bookmarkIcon = findViewById(R.id.home_bookmarkicon);
         profileIcon = findViewById(R.id.home_accounticon);
         profileCircle = findViewById(R.id.home_circleoutline);
+        settingsIcon=findViewById(R.id.home_settingicon);
 
         profileCircle.setVisibility(View.GONE);
 
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         Glide.with(this).load(thumb_image).into(profileIcon);
 
+        //add new post
         addIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        //bottom nav click listeners
         homeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 searchIcon.clearColorFilter();
                 //profileIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
+                settingsIcon.setVisibility(View.GONE);
 
                 fragment = HomeFeedFragment.newInstance();
                 getSupportFragmentManager().beginTransaction()
@@ -81,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
-
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 searchIcon.setColorFilter(Color.BLACK);
                 homeIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
+                settingsIcon.setVisibility(View.GONE);
 
                 fragment = SearchFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null)
@@ -97,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
-
         profileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,12 +110,12 @@ public class MainActivity extends AppCompatActivity {
                 searchIcon.clearColorFilter();
                 homeIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
+                settingsIcon.setVisibility(View.VISIBLE);
 
                 fragment = ProfileFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
             }
         });
-
         bookmarkIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 bookmarkIcon.setColorFilter(Color.BLACK);
                 searchIcon.clearColorFilter();
                 homeIcon.clearColorFilter();
+                settingsIcon.setVisibility(View.GONE);
 
                 fragment = BookmarksFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
