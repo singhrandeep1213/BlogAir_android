@@ -33,7 +33,6 @@
             android:id="@+id/signup_backtv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:text="Back"
             android:textColor="#FFFFFF"
             android:textSize="20dp"

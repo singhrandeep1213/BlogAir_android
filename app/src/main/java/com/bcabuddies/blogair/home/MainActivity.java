@@ -16,6 +16,7 @@ import com.bcabuddies.blogair.home.fragments.BookmarksFragment;
 import com.bcabuddies.blogair.home.fragments.HomeFeedFragment;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
 import com.bcabuddies.blogair.home.fragments.SearchFragment;
+import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bumptech.glide.Glide;
@@ -129,6 +130,13 @@ public class MainActivity extends AppCompatActivity {
                 fragment = BookmarksFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
+            }
+        });
+
+        settingsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingsMain.class));
             }
         });
 
