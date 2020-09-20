@@ -63,7 +63,7 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/settingsscc_namelayout"
+        android:id="@+id/settingschangep_oldlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/round_btn"
@@ -94,7 +94,7 @@
         app:layout_constraintBottom_toTopOf="@+id/settingsscc_savebtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsscc_namelayout">
+        app:layout_constraintTop_toBottomOf="@+id/settingschangep_oldlayout">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/settingsscc_biolayout"
