@@ -5,28 +5,64 @@
     android:layout_height="match_parent"
     tools:context="com.bcabuddies.blogair.home.fragments.ProfileFragment">
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/account_toplayout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#EDEDED">
+
+        <TextView
+            android:id="@+id/account_toplayouttv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="Account"
+            android:textSize="20dp"
+            android:textColor="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/account_settingicon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/settings_icon"
+            android:visibility="visible"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/account_userimage"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="10dp"
         android:src="@drawable/default_user_icon"
-        app:layout_constraintBottom_toTopOf="@id/account_postcount"
+        app:layout_constraintBottom_toTopOf="@id/account_biotv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/account_toplayout"/>
 
     <TextView
         android:id="@+id/account_followercount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:gravity="center"
         android:text="1500"
-        app:layout_constraintBottom_toTopOf="@id/account_followertv"
+        app:layout_constraintBottom_toTopOf="@+id/account_biotv"
         app:layout_constraintEnd_toStartOf="@+id/account_userimage"
-
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/account_userimage" />
 
     <TextView
         android:id="@+id/account_followertv"
@@ -34,33 +70,44 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Followers"
-        app:layout_constraintBottom_toBottomOf="@+id/account_userimage"
+        app:layout_constraintBottom_toTopOf="@+id/account_followercount"
         app:layout_constraintEnd_toStartOf="@+id/account_userimage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/account_userimage" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/account_postcount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="10dp"
-        android:text="Posts: 100"
+        android:text="Followers"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/account_followingcount"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_userimage" />
+        app:layout_constraintStart_toStartOf="@+id/account_followingcount" />
+
+    <TextView
+        android:id="@+id/account_followingcount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="1500"
+        app:layout_constraintBottom_toBottomOf="@+id/account_userimage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/account_userimage"
+        app:layout_constraintTop_toTopOf="@+id/account_userimage" />
+
 
     <TextView
         android:id="@+id/account_biotv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:maxLines="2"
-        android:text="@string/app_content"
+        android:text=""
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_postcount" />
+        app:layout_constraintTop_toBottomOf="@id/account_userimage" />
 
     <!--more and less layout-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -78,7 +125,7 @@
             android:layout_marginEnd="10dp"
             android:text="@string/more"
             android:textColor="#000000"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -3,15 +3,24 @@ package com.bcabuddies.blogair.model;
 public class LoginToken {
 
 
-    String message,error,token,name,thumb_image,uid;
+    String message,error,token,name,thumb_image,uid,bio;
 
-    public LoginToken(String message, String error, String token, String name, String thumb_image, String uid) {
+    public LoginToken(String message, String error, String token, String name, String thumb_image, String uid, String bio) {
         this.message = message;
         this.error = error;
         this.token = token;
         this.name = name;
         this.thumb_image = thumb_image;
         this.uid = uid;
+        this.bio = bio;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getMessage() {

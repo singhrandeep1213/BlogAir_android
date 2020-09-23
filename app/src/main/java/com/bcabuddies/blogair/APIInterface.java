@@ -3,6 +3,7 @@ package com.bcabuddies.blogair;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
 import com.bcabuddies.blogair.model.LoginUser;
+import com.bcabuddies.blogair.model.ThumbImageResponse;
 import com.bcabuddies.blogair.model.UserPosts;
 import com.bcabuddies.blogair.utils.Constants;
 
@@ -52,6 +53,16 @@ public interface APIInterface {
     @Multipart
     @POST("/user/post/addnew")
     Call<ResponseBody> addNewPost(@Header("authorization") String token, @Part("pid") RequestBody pid , @Part("post_desc") RequestBody postDesc, @Part MultipartBody.Part file, @Part("post_heading") RequestBody postHeading);
+
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/update/nameandbio")
+    @FormUrlEncoded
+    Call<ResponseBody> updateNameAndBio(@Header("authorization") String token ,@Field("full_name") String full_name, @Field("bio") String bio);
+
+    @Headers(Constants.KEY_HEADER)
+    @Multipart
+    @POST("/user/update/thumbimage")
+    Call<ThumbImageResponse> updateThumbImage(@Header("authorization") String token, @Part MultipartBody.Part file);
 
 
 /*

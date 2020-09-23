@@ -16,7 +16,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 
 //const baseURL = 'https://myblogs.harshitaapptech.com/myblog/api/v3'; //live
-const baseURL = 'http://192.168.1.6:3000'; //local
+const baseURL = 'http://192.168.1.3:3000'; //local
 
 //databse connection
 var mysqlConnection= mysql.createConnection({
@@ -27,20 +27,37 @@ var mysqlConnection= mysql.createConnection({
 	charset : 'utf8mb4'
 });
 
-//post imgae storage
+//profile imgae storage
 var storageProfile = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './public/post_images');
+        cb(null, './public/profile_images');
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname  + uuid.v4() +
+        cb(null, file.fieldname  + '_' + uuid.v4() +
             path.extname(file.originalname));
     }
 });
 
+//post imgae storage
+var storagePost = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/post_images');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname  +'_'+ uuid.v4() +
+            path.extname(file.originalname));
+    }
+});
+
+
+
 const uploadPostImage = multer({
-	 storage: storageProfile 
+	 storage: storagePost
 	});
+
+const uploadProfileImage =multer({
+	storage: storageProfile
+});
 
 //connect to database
 mysqlConnection.connect((err)=>{
@@ -116,6 +133,69 @@ app.post('/user',(req,res)=>{
 	})
 });
 
+//add or edit name or user bio
+app.post('/user/update/nameandbio',verifyHeader,verifyToken, upload.none(), async(req,res)=>{
+	console.log('header: ', req.key);
+	console.log('update token: ',req.token);
+
+	jwt.verify(req.token,SecretKey, async function (err, authData){
+		if(!!err){
+			res.sendStatus(401);
+		}
+		else{
+			var data= req.body;
+			var full_name=data.full_name;
+			var bio= data.bio;
+			var uid= authData.user.id;
+			console.log('updating uid:  ',uid);
+			mysqlConnection.query('UPDATE `user` SET  full_name = ? , bio = ?   WHERE uid = ? ;',[full_name,bio,uid], async function(err,rows){
+
+				if(!!err){
+					var obj={
+						message: 'failed',
+						error: err
+					}
+					console.log('error in updating:  ',err);
+					res.status(401).send(obj);
+				}
+				else{
+					var obj={
+						message: 'success',
+						error: false
+					}
+					console.log('successfully updated');
+					res.status(200).send(obj);
+				}
+			});		
+		}
+	}) 
+
+});
+
+
+//update user profile image
+app.post('/user/update/thumbimage',verifyHeader,verifyToken,uploadProfileImage.single('profile_image'), async(req,res)=>{
+
+	jwt.verify(req.token, SecretKey, async function(err,authData){
+		if(err){
+			console.log('error in uploading profile image: ', err);
+		}
+		else{
+			var token=req.token;
+			var thumb_image_url= req.file.filename;
+			console.log('thumb_image_url: ',thumb_image_url);
+			var uid = authData.user.id;
+			uploadThumbImage(uid,thumb_image_url,token).then(function(result){
+				res.status(200).send(result);
+			}).catch(function(error){
+				console.log('Promise rejected error: ',error);
+			});
+		}
+	});
+
+
+});
+
 //add new post
 app.post('/user/post/addnew',verifyHeader,verifyToken,  uploadPostImage.single('post_image'),  async(req,res)=>{
 
@@ -158,7 +238,7 @@ app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
 		var uid=data.uid;
 
 		//change this while live server
-		var thumb_image='https://toppng.com/uploads/preview/file-svg-user-icon-material-desi-11563317072p2p27gjccw.png';
+		var thumb_image=baseURL + "/user/defaultthumbimage/" + 'default_thumb_image.png';
 		console.log('register request: ');
 		console.log('full_naame:  ', full_name);
 		console.log('email_id:  ',email_id);
@@ -254,7 +334,7 @@ app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
 		var token=req.token;
 		const auth_uid= authData.user.id;
 		if(auth_uid==req.params.uid){
-			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? ',[req.params.uid],(err,rows,fields)=>{
+			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? order by time_stamp desc',[req.params.uid],(err,rows,fields)=>{
 				if(!err){
 					
 					Object.keys(rows).forEach(key => {
@@ -331,6 +411,7 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 						var singlePost=rows[key]
 						if (rows[key].post_image != null) {
 							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
+							singlePost.thumb_image=baseURL + "/user/thumbimage/" + token + "/" + rows[key].thumb_image;
 							//console.log('post image:   ', rows[key].post_image);
 						}
 						current_pid= singlePost.pid;
@@ -385,7 +466,7 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 });
 
 
-//get single image url
+//get single post image url
 app.get('/post/image/:token/:image_id', function(req,res){
 
 	console.log('get worked');
@@ -428,7 +509,72 @@ app.get('/post/image/:token/:image_id', function(req,res){
 })
 
 
+//get single profile imageurl
+app.get('/user/thumbimage/:token/:image_id', function(req,res){
 
+	console.log('get worked');
+	
+	var token =req.params.token;
+	console.log('token:  ',token);
+	
+	jwt.verify(token, SecretKey , (err,authData) => {
+		if(!!err){
+			console.log('user not verified ')
+			res.sendStatus(401);
+		}
+		else{
+			//user is verified
+			var image_id = req.params.image_id;
+			console.log('image id:  ',image_id);
+			//return image file using file name present in database
+
+			//change this when live
+			//var filepath = __dirname + "/public/post_images/" + image_id;
+			var filepath= 'D:/work/Android/BlogAir/api/user/public/profile_images/' + image_id;
+			console.log('filepath:  ',filepath);
+			try{
+				if(fileSys.existsSync(filepath)){
+					res.sendFile(filepath);
+				}
+				else{
+					console.log('error in if:  ');
+					res.sendStatus(404);
+				}
+			}catch(err){
+				console.log('getting error in try:  ',err);
+				res.sendStatus(404);
+			}
+		}
+		
+
+	})
+
+})
+
+//get default user profile imageurl
+app.get('/user/defaultthumbimage/:image_id',function(req,res){
+	var image_id = req.params.image_id;
+			console.log('image id:  ',image_id);
+			//return image file using file name present in database
+
+			//change this when live
+			//var filepath = __dirname + "/public/post_images/" + image_id;
+			var filepath= 'D:/work/Android/BlogAir/api/user/public/profile_images/' + image_id;
+			console.log('filepath:  ',filepath);
+			try{
+				if(fileSys.existsSync(filepath)){
+					res.sendFile(filepath);
+				}
+				else{
+					console.log('error in if:  ');
+					res.sendStatus(404);
+				}
+			}catch(err){
+				console.log('getting error in try:  ',err);
+				res.sendStatus(404);
+			}
+
+})
 
 //login User
 app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
@@ -441,7 +587,7 @@ app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 		console.log('email:  ', email_id);
 		console.log('password:  ',password);
 		console.log("header key: ",req.key)
-		mysqlConnection.query('select full_name,uid,password, thumb_image from user where email_id = ?' , [email_id] , async function(err, rows) {
+		mysqlConnection.query('select full_name,uid,password, thumb_image, bio from user where email_id = ?' , [email_id] , async function(err, rows) {
 	
 			if(!!err){
 				console.log('error in email check query');
@@ -484,13 +630,15 @@ app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 										res.status(400).send(obj);
 								}
 								else{
+									var thumb_image = baseURL + "/user/thumbimage/" + token + "/" + rows[0].thumb_image;
 									const obj ={
 										message :'login success',
 										error: false,
 										token: token,
 										name: rows[0].full_name,
-										thumb_image:rows[0].thumb_image,
-										uid: rows[0].uid
+										thumb_image:thumb_image,
+										uid: rows[0].uid,
+										bio: rows[0].bio
 									};
 	
 	
@@ -602,7 +750,7 @@ function verifyToken(req, res, next) {
 }
 
 
-//upload image function
+//upload post image function
 async function uploadPost(pid,post_desc,post_image_url,uid,post_heading){
 
 	return new Promise(function(resolve,reject){
@@ -628,4 +776,91 @@ async function uploadPost(pid,post_desc,post_image_url,uid,post_heading){
 
 	});
 
+}
+
+//upload profile image function
+async function uploadThumbImage(uid, thumb_image_url,token){
+
+	return new Promise(function(resolve,rejct){
+
+		mysqlConnection.query('select thumb_image from user where uid= ? ', [uid],function(err,rows){
+			if(err){
+				console.log('error in query');
+				var obj = {
+					error: true,
+					message: "Error"
+				}
+				reject(obj);
+			}
+			else{
+				try{
+					var url = rows[0].thumb_image;
+					if(url === "" | url === null){
+						//image is not present
+						mysqlConnection.query('update user set thumb_image=? where uid=?',[thumb_image_url,uid], async function(err,rows){
+							if(!err){
+								imageUrl= baseURL + "/user/thumbimage/" + token + "/" + thumb_image_url;
+								var obj = {
+									error: false,
+									message: "Success",
+									thumb_image:imageUrl
+								}
+								resolve(obj);
+							}
+							else{
+								var obj = {
+									error: true,
+									message: "Error: " + err
+								}
+								reject(obj);
+							}
+						})
+				
+					}
+					else{
+						deleteOldProfile(url);
+						mysqlConnection.query('update user set thumb_image=? where uid=?',[thumb_image_url,uid], async function(err,rows){
+							if(!err){
+								imageUrl= baseURL + "/user/thumbimage/" + token + "/" + thumb_image_url;
+								var obj = {
+									error: false,
+									message: "Success",
+									thumb_image:imageUrl
+								}
+								resolve(obj);
+							}
+							else{
+								var obj = {
+									error: true,
+									message: "Error: " + err
+								}
+								reject(obj);
+							}
+						})
+				
+					}
+				}
+				catch (exception) {
+                            console.log('exception', exception);
+                   
+                        }
+
+			}
+
+
+		});
+
+		
+
+	});
+
+}
+
+async function deleteOldProfile(_fileName) {
+    fileSys.unlink('./public/profile_images/' + _fileName, function (err) {
+        if (err) {
+            console.log(err);
+            throw err;
+        }
+    });
 }

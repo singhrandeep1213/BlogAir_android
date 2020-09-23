@@ -5,9 +5,51 @@
     android:layout_height="match_parent"
     tools:context="com.bcabuddies.blogair.home.fragments.HomeFeedFragment">
 
-  <androidx.recyclerview.widget.RecyclerView
+
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/homefeed_toplayout"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:id="@+id/homefrag_recyclerview"/>
+      android:layout_height="50dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      android:background="#EDEDED">
+
+    <TextView
+        android:id="@+id/homefedd_toplayouttv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Home Feed"
+        android:textSize="20dp"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/homefeed_notificon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/notification_icon"
+        android:visibility="visible"/>
+
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/homefrag_recyclerview"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/homefeed_toplayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,10 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment fragment = null;
     private static final String TAG = "MainActivity";
-    TextView topLayoutTv;
+
     PreferenceManager preferenceManager;
     String thumb_image;
-    ImageView homeIcon, searchIcon, addIcon, bookmarkIcon, settingsIcon;
+    ImageView homeIcon, searchIcon, addIcon, bookmarkIcon;
     CircleImageView profileIcon, profileCircle;
 
     @Override
@@ -42,14 +42,12 @@ public class MainActivity extends AppCompatActivity {
         thumb_image = preferenceManager.getString(Constants.KEY_THUMB_IMAGE);
         Log.e(TAG, "onCreate: thumb_image: " + thumb_image);
         fragment = HomeFeedFragment.newInstance();
-        topLayoutTv = findViewById(R.id.home_toplayouttv);
         homeIcon = findViewById(R.id.home_homeicon);
         searchIcon = findViewById(R.id.home_searchicon);
         addIcon = findViewById(R.id.home_addicon);
         bookmarkIcon = findViewById(R.id.home_bookmarkicon);
         profileIcon = findViewById(R.id.home_accounticon);
         profileCircle = findViewById(R.id.home_circleoutline);
-        settingsIcon=findViewById(R.id.home_settingicon);
 
         profileCircle.setVisibility(View.GONE);
 
@@ -73,13 +71,11 @@ public class MainActivity extends AppCompatActivity {
         homeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                topLayoutTv.setText("Home Feed");
                 profileCircle.setVisibility(View.GONE);
                 homeIcon.setColorFilter(Color.BLACK);
                 searchIcon.clearColorFilter();
                 //profileIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
-                settingsIcon.setVisibility(View.GONE);
 
                 fragment = HomeFeedFragment.newInstance();
                 getSupportFragmentManager().beginTransaction()
@@ -90,12 +86,10 @@ public class MainActivity extends AppCompatActivity {
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                topLayoutTv.setText("Explore");
                 profileCircle.setVisibility(View.GONE);
                 searchIcon.setColorFilter(Color.BLACK);
                 homeIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
-                settingsIcon.setVisibility(View.GONE);
 
                 fragment = SearchFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null)
@@ -106,12 +100,10 @@ public class MainActivity extends AppCompatActivity {
         profileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                topLayoutTv.setText("Account");
                 profileCircle.setVisibility(View.VISIBLE);
                 searchIcon.clearColorFilter();
                 homeIcon.clearColorFilter();
                 bookmarkIcon.clearColorFilter();
-                settingsIcon.setVisibility(View.VISIBLE);
 
                 fragment = ProfileFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
@@ -120,12 +112,10 @@ public class MainActivity extends AppCompatActivity {
         bookmarkIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                topLayoutTv.setText("Bookmarks");
                 profileCircle.setVisibility(View.GONE);
                 bookmarkIcon.setColorFilter(Color.BLACK);
                 searchIcon.clearColorFilter();
                 homeIcon.clearColorFilter();
-                settingsIcon.setVisibility(View.GONE);
 
                 fragment = BookmarksFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
@@ -133,12 +123,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        settingsIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SettingsMain.class));
-            }
-        });
 
     }
 }

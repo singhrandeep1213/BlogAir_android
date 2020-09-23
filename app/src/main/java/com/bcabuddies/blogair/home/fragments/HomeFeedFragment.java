@@ -1,10 +1,12 @@
 package com.bcabuddies.blogair.home.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
+import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
@@ -46,6 +50,7 @@ public class HomeFeedFragment extends Fragment {
     boolean noMoreResults = false;
     boolean listEnd = false;
 
+
     public HomeFeedFragment() {
         //required empty constructure
     }
@@ -63,6 +68,8 @@ public class HomeFeedFragment extends Fragment {
         token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         uid = preferenceManager.getString(Constants.KEY_UID);
         fullName = preferenceManager.getString(Constants.KEY_FUll_NAME);
+
+
 
         //test for values
         Log.e(TAG, "onCreate: full name:  " + fullName);
@@ -92,6 +99,7 @@ public class HomeFeedFragment extends Fragment {
                 }
             }
         });
+
 
 
         return view;

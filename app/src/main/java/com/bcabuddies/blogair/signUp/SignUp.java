@@ -122,6 +122,7 @@ public class SignUp extends AppCompatActivity {
                     preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
                     preferenceManager.saveString(Constants.KEY_UID, uid);
                     preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumb_image);
+                    preferenceManager.saveString(Constants.KEY_USER_BIO," ");
                     Log.e(TAG, "onResponse: reg token:  " + loginToken);
                     startActivity(new Intent(SignUp.this, MainActivity.class));
                     SignUp.this.finish();

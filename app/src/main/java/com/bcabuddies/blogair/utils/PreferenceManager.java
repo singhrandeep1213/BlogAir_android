@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class PreferenceManager {
+
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private int mode = 0;
@@ -30,6 +31,10 @@ public class PreferenceManager {
         return sharedPreferences.getString(key, "");
     }
 
+    public void clearPrefrenceManager(){
+        editor.clear();
+        editor.commit();
+    }
 
    /* public void createSession(String emailId,String fullName, String tokenValue, String thumbImage,String uid) {
         editor.putString(KEY_EMAIL_ID,emailId);

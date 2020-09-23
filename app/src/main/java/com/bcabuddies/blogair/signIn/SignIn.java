@@ -41,7 +41,7 @@ public class SignIn extends AppCompatActivity {
     List<LoginToken> tokenList;
     List<LoginUser> userList;
     String emailId, password;
-    String loginToken = "", uid = "", fullName = "", thumbImage = "";
+    String loginToken = "", uid = "", fullName = "", thumbImage = "", bio="";
     private PreferenceManager preferenceManager;
 
 
@@ -103,6 +103,7 @@ public class SignIn extends AppCompatActivity {
                 fullName = response.body().getName();
                 loginToken = response.body().getToken();
                 thumbImage = response.body().getThumb_image();
+                bio=response.body().getBio();
                 uid = response.body().getUid();
 
                 //test values
@@ -115,6 +116,7 @@ public class SignIn extends AppCompatActivity {
                 preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
                 preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
                 preferenceManager.saveString(Constants.KEY_UID, uid);
+                preferenceManager.saveString(Constants.KEY_USER_BIO,bio);
                 preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumbImage);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(new Intent(SignIn.this, MainActivity.class));
