@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/blockeduser_thumbimage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/account_icon" />
+
+    <TextView
+        android:id="@+id/blockeduser_fullnane"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Full Name"
+        android:textSize="25dp"
+        app:layout_constraintEnd_toStartOf="@+id/blockeduser_unblockbtn"
+        app:layout_constraintStart_toEndOf="@+id/blockeduser_thumbimage"
+        app:layout_constraintTop_toTopOf="@+id/blockeduser_thumbimage" />
+
+    <Button
+        android:id="@+id/blockeduser_unblockbtn"
+        style="@style/GreyButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="Unblock"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/blockeduser_thumbimage" />
+</androidx.constraintlayout.widget.ConstraintLayout>

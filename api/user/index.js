@@ -196,6 +196,65 @@ app.post('/user/update/thumbimage',verifyHeader,verifyToken,uploadProfileImage.s
 
 });
 
+
+//change password from app
+app.post('/user/update/password', verifyHeader, verifyToken, upload.none(), async(req,res)=>{
+
+	jwt.verify(req.token,SecretKey, async function(err, authData){
+		if(err){
+			console.log('error in token: ', err);
+			res.sendStatus(401);
+		}
+		else{
+			var data= req.body;
+			var old_password= data.old_password;
+			var new_password= data.new_password;
+			var uid= authData.user.id;
+			mysqlConnection.query('select password from user where uid =?',[uid], async function(err, rows){
+				if(err){
+					console.log('error in query');
+					res.sendStatus(401);
+				}
+				else{
+					var current_password=rows[0].password;
+					if(current_password == old_password){
+					
+						mysqlConnection.query('update user set password =? where uid = ?',[new_password,uid],async function(err,rows){
+
+							if(err){
+								console.log('failed to update new password');
+								res,sendStatus(401);
+							}
+							else{
+								var obj={
+									error: false,
+									message: 'new password successfully updated'
+								}
+								res.status(200).send(obj);
+							}
+						});
+
+					}else{
+						var obj={
+							error: true,
+							message: 'Old password does not match'
+						}
+						res.status(401).send(obj);
+					}
+				}
+
+
+			})
+
+
+		}
+
+
+	});
+
+
+});
+
 //add new post
 app.post('/user/post/addnew',verifyHeader,verifyToken,  uploadPostImage.single('post_image'),  async(req,res)=>{
 
@@ -365,7 +424,6 @@ app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
 })
 	
 });
-
 
 
 //get user home_feed pass current_user_uid and page_no
@@ -575,6 +633,68 @@ app.get('/user/defaultthumbimage/:image_id',function(req,res){
 			}
 
 })
+
+//get blocked users list
+app.get('/user/blocked/users',verifyHeader, verifyToken,function(req,res){
+
+	jwt.verify(req.token,SecretKey,async function(err, authData){
+
+		if(err){
+			res.sendStatus(401);
+		}
+		else{
+			console.log('user verified: ');
+			var uid=authData.user.id;
+			mysqlConnection.query('SELECT u.full_name, u.thumb_image, u.uid from blocked_users b inner join user u on b.blocked_uid = u.uid where blocker_uid=?',[uid],async function(err,rows){
+				if	(err){
+					console.log('error while getting: ', err);
+				}
+				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
+					console.log('error here1');
+					//no user found
+					var obj={
+						error: false,
+						message: 'no user found',
+						blocked_users: []
+					}
+					res.status(200).send(obj);
+				}
+				else{
+					var token=req.token;
+					console.log('error here2');
+					var allUsers = []
+                	var counter = 0;
+                   	var exitCondition = rows.length - 1
+
+					Object.keys(rows).forEach(key => {
+						var singleUser=rows[key];
+						if (rows[key].thumb_image != null) {
+							singleUser.thumb_image=baseURL + "/user/thumbimage/" + token + "/" + rows[key].thumb_image;
+							//console.log('post image:   ', rows[key].post_image);
+						}
+						allUsers.push(singleUser);
+						var obj={
+							error: false,
+							message: 'user found',
+							blocked_users: allUsers
+						}
+						if (counter == exitCondition) {
+							res.status(200).send(obj);
+						}
+						counter++;
+					});
+					
+				}
+
+			});
+		}
+
+
+	});
+
+
+
+});
 
 //login User
 app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{

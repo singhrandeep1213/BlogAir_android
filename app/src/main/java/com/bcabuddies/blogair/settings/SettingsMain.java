@@ -22,13 +22,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsMain extends AppCompatActivity {
 
-    ConstraintLayout accountSettingLayout, changePasswordLayout, blockedUsersLayout;
+    ConstraintLayout accountSettingLayout, changePasswordLayout, blockedUsersLayout,logoutLayout;
     CircleImageView thumbImageView;
     String fullName, thumbImageUrl;
     PreferenceManager preferenceManager;
     TextView fullNameTv;
     ImageView backImageIcon;
-    Button btnLogout;
+
 
 
     @Override
@@ -43,7 +43,7 @@ public class SettingsMain extends AppCompatActivity {
         thumbImageView = findViewById(R.id.settings_thumbicon);
         fullNameTv = findViewById(R.id.settings_fullnameTv);
         backImageIcon = findViewById(R.id.settings_backicon);
-        btnLogout = findViewById(R.id.settings_logoutbtn);
+        logoutLayout=findViewById(R.id.settings_logoutlayout);
 
         thumbImageUrl = preferenceManager.getString(Constants.KEY_THUMB_IMAGE);
         fullName = preferenceManager.getString(Constants.KEY_FUll_NAME);
@@ -78,7 +78,7 @@ public class SettingsMain extends AppCompatActivity {
             }
         });
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 preferenceManager.clearPrefrenceManager();
@@ -86,5 +86,6 @@ public class SettingsMain extends AppCompatActivity {
                 startActivity(new Intent(SettingsMain.this, Welcome.class));
             }
         });
+
     }
 }

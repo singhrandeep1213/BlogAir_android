@@ -96,32 +96,36 @@ public class SignIn extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginToken> call, Response<LoginToken> response) {
                 if (!response.isSuccessful()) {
-                    Toast.makeText(SignIn.this, "Incorrect email or paasword", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignIn.this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "onResponse: code: " + response.code());
-                }
+                }else{
 
-                fullName = response.body().getName();
-                loginToken = response.body().getToken();
-                thumbImage = response.body().getThumb_image();
-                bio=response.body().getBio();
-                uid = response.body().getUid();
+                    fullName = response.body().getName();
+                    loginToken = response.body().getToken();
+                    thumbImage = response.body().getThumb_image();
+                    bio=response.body().getBio();
+                    uid = response.body().getUid();
 
-                //test values
+                    //test values
 /*                  Log.e(TAG, "onResponse: token:  " + loginToken);
                     Log.e(TAG, "onResponse: thumb image:  " + thumbImage);
                     Log.e(TAG, "onResponse: uid:  " + uid);
                     Log.e(TAG, "onResponse: full name:  " + fullName);*/
 
 
-                preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
-                preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
-                preferenceManager.saveString(Constants.KEY_UID, uid);
-                preferenceManager.saveString(Constants.KEY_USER_BIO,bio);
-                preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumbImage);
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(new Intent(SignIn.this, MainActivity.class));
+                    preferenceManager.saveString(Constants.KEY_JWT_TOKEN, loginToken);
+                    preferenceManager.saveString(Constants.KEY_FUll_NAME, fullName);
+                    preferenceManager.saveString(Constants.KEY_UID, uid);
+                    preferenceManager.saveString(Constants.KEY_USER_BIO,bio);
+                    preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,thumbImage);
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(new Intent(SignIn.this, MainActivity.class));
 
-                SignIn.this.finish();
+                    SignIn.this.finish();
+
+                }
+
+
 
 
                 // LoginToken tokenList = response.body();
