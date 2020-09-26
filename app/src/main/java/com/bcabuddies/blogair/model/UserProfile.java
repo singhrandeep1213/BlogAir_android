@@ -25,6 +25,9 @@ public class UserProfile {
     @SerializedName("type")
     private  String type;
     @Expose
+    @SerializedName("bio")
+    private String bio;
+    @Expose
     @SerializedName("post")
     private List<UserProfile.Post> Post;
 
@@ -36,6 +39,14 @@ public class UserProfile {
 
     public void setError(boolean error) {
         this.error = error;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getType() {

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
@@ -59,7 +60,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         String pid= homeFeedList.get(position).getPid();
         String postUid=homeFeedList.get(position).getUid();
         String fullName= homeFeedList.get(position).getFull_name();
-
+        String thumbImage=homeFeedList.get(position).getThumb_image();
         String currentUid=preferenceManager.getString(Constants.KEY_UID);
         String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
@@ -67,7 +68,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
 
         Glide.with(context)
-                .load(homeFeedList.get(position).getThumb_image())
+                .load(thumbImage)
                 .into(holder.userThumb);
         Glide.with(context)
                 .load(homeFeedList.get(position).getPost_image())
@@ -135,18 +136,22 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 if  (postUid.equals(currentUid)){
                     Fragment fragment= ProfileFragment.newInstance();
                     AppCompatActivity activity= (AppCompatActivity) v.getContext();
-                    activity.getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+                    FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
+                    ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
                     Log.e(TAG, "onClick: current user: " );
                 }
                 else{
                     bundle.putString("post_uid",postUid);
                     bundle.putString("full_name",fullName);
+                    bundle.putString("thumb_image",thumbImage);
                     AppCompatActivity activity= (AppCompatActivity) v.getContext();
                     Fragment fragment= PostUserProfile.newInstance();
                     fragment.setArguments(bundle);
-                    activity.getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
-
+                    FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
+                    ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
                     Log.e(TAG, "onClick: not current user" );
                 }

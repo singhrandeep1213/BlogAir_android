@@ -1136,6 +1136,7 @@ async function getUserProfile(passed_user_id, message,type,token){
 			posts=[];
 			var following_count;
 			var followers_count;
+			var bio;
 			Object.keys(rows).forEach(key => {
 				var singlePost=rows[key]
 				if (rows[key].post_image != null) {
@@ -1164,6 +1165,22 @@ async function getUserProfile(passed_user_id, message,type,token){
 
 		});
 
+		//get user bio
+		mysqlConnection.query('select bio from user where uid=?', [passed_user_id], (err, rows)=>{
+			if(err){
+				console.log('err in query 2');
+				var obj = {
+					error: true,
+					message: "Error: " + err
+				}
+				reject(obj);
+			}
+			else{
+				bio=rows[0].bio;
+
+			}
+		})
+
 		//get followers count
 		mysqlConnection.query('select COUNT(following_uid) as followers_count from follow WHERE following_uid=?',[passed_user_id],(err, rows)=>{
 			if(err){
@@ -1185,6 +1202,7 @@ async function getUserProfile(passed_user_id, message,type,token){
 			type: type,
 			following_count: following_count,
 			followers_count:followers_count,
+			bio:bio,
 			post: posts
 		}
 		resolve(obj);
