@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.ProfileRecyclerAdapter;
-import com.bcabuddies.blogair.model.UserPosts;
+import com.bcabuddies.blogair.model.UserProfile;
 import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
@@ -39,7 +39,7 @@ public class ProfileFragment extends Fragment {
     TextView userBioMore, userBioLess;
     private static final String TAG = "ProfileFragment";
     RecyclerView postRecyclerView;
-    List<UserPosts> postList;
+    List<UserProfile.Post> postList;
     ProfileRecyclerAdapter profileRecyclerAdapter;
     PreferenceManager preferenceManager;
     String token, uid, thumb_image, bio;
@@ -121,25 +121,28 @@ public class ProfileFragment extends Fragment {
     private void callApi() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
         APIInterface userPostsApi = retrofit.create(APIInterface.class);
-        Call<List<UserPosts>> listCall = userPostsApi.getUserPosts("bearer " + token, uid);
+        Call<UserProfile> listCall = userPostsApi.getUserPosts("bearer " + token, uid);
 
-        listCall.enqueue(new Callback<List<UserPosts>>() {
+        listCall.enqueue(new Callback<UserProfile>() {
             @Override
-            public void onResponse(Call<List<UserPosts>> call, Response<List<UserPosts>> response) {
+            public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: prpfile error:  " + response.code());
                 } else {
-                    List<UserPosts> posts = response.body();
+                    List<UserProfile.Post> posts = response.body().getPost();
                     postList.addAll(posts);
                     profileRecyclerAdapter.notifyDataSetChanged();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<UserPosts>> call, Throwable t) {
+            public void onFailure(Call<UserProfile> call, Throwable t) {
 
             }
         });
+
+
+
 
 
     }

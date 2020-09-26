@@ -129,6 +129,7 @@ public class HomeFeedFragment extends Fragment {
                    if (response.body().getPost()!=null){
                        List<com.bcabuddies.blogair.model.HomeFeed.Post> homeFeeds = response.body().getPost();
                        finalList.addAll(homeFeeds);
+
                        homeRecyclerAdapter.notifyDataSetChanged();
                        Log.e(TAG, "onResponse: final" + finalList);
                    }

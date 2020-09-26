@@ -67,6 +67,8 @@ mysqlConnection.connect((err)=>{
 		console.log('DB connecton status: Failed to connect '+ JSON.stringify(err,undefined,2));
 });
 
+
+//starting server
 app.listen(3000,()=>console.log('express server is running at port no : 3000'),'192.168.4.159');
 
 
@@ -382,8 +384,8 @@ app.get('/post',(req,res)=>{
 
 
 
- //get all posts of a user (i.e. user profile)
-app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
+ //get all posts of current logged in user (i.e. user profile)
+app.get('/user/current/profile/:uid',verifyHeader,verifyToken,(req,res)=>{
 
 	jwt.verify(req.token ,SecretKey, async function(err,authData){
 	if(!!err){
@@ -392,20 +394,68 @@ app.get('/user/profile/posts/:uid',verifyHeader,verifyToken,(req,res)=>{
 	else{
 		var token=req.token;
 		const auth_uid= authData.user.id;
-		if(auth_uid==req.params.uid){
-			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? order by time_stamp desc',[req.params.uid],(err,rows,fields)=>{
+		var uid=req.params.uid; 
+		if(auth_uid==uid){
+			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? order by time_stamp desc',[uid],(err,rows,fields)=>{
 				if(!err){
-					
+					var post=[];
+					var following_count;
+					var followers_count;
 					Object.keys(rows).forEach(key => {
 						var singlePost=rows[key]
 						if (rows[key].post_image != null) {
 							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
 							console.log('post image:   ', rows[key].post_image);
 						}
-					
+						post.push(singlePost)
 					});
-					console.log('account posts retireve successfully');
-					res.send(rows);
+
+
+					//get following count
+					mysqlConnection.query('select COUNT(following_uid) as following_count from follow WHERE follower_uid=?',[uid],(err, rows)=>{
+						if(err){
+							console.log('err in query 2');
+							var obj = {
+								error: true,
+								message: "Error: " + err
+							}
+							res.status(401).send(obj);
+						}
+						else{
+							following_count= rows[0].following_count;
+							console.log('following count', following_count);
+						}
+
+					});
+
+					//get followers count
+					mysqlConnection.query('select COUNT(following_uid) as followers_count from follow WHERE following_uid=?',[uid],(err, rows)=>{
+						if(err){
+							console.log('err in query 2');
+							var obj = {
+								error: true,
+								message: "Error: " + err
+							}
+							res.status(401).send(obj);
+						
+						}
+						else{
+							followers_count= rows[0].followers_count;
+							console.log('followers count', followers_count);
+							var obj= {
+								error: false,
+								message: 'current_user',
+								type: 'current',
+								following_count:following_count,
+								followers_count:followers_count,
+								post: post
+							}
+							res.status(200).send(obj);
+						}
+					});
+
+
+				
 				}
 				else{
 					console.log(err);
@@ -521,6 +571,84 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 			})
 		}
 	})
+});
+
+
+//get user profile (not current) pass uid
+app.get('/user/post/profile/:puid',verifyHeader,verifyToken,upload.none(), (req,res)=>{
+
+	jwt.verify(req.token, SecretKey, (err, authData)=>{
+		if(err){
+			console.log('user not verified');
+			res.status(401);
+		}
+		else{
+			var current_user_id= authData.user.id;
+			var passed_user_id= req.params.puid;
+			var token=req.token;
+			console.log('current user id: ', current_user_id);
+			console.log('passed user id: ', passed_user_id);
+			mysqlConnection.query('select following_uid from follow where follower_uid=? and following_uid = ? ', [current_user_id, passed_user_id], (err,rows)=>{
+				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
+					//current user not following passed user
+					console.log('not following: ');	
+
+					//check if profile is public or not
+					mysqlConnection.query('select is_public from user where uid=?',[passed_user_id],(err, rows)=>{
+						if(err){
+							console.log('error in query');
+							res.sendStatus(401);
+						}
+						else{
+							if (rows[0].is_public == 1){
+								console.log('user is public');
+								var message='user_is_public';
+								var type='public';
+								console.log('tokennn here : ',token);
+								getUserProfile(passed_user_id,message,type,token).then(function(result){
+									res.status(200).send(result);
+								}).catch(function(error){
+									console.log('promise rejected error: ', error);
+								})
+							}
+							else{
+								console.log('user is private');
+								var type='private';
+								var obj={
+									error: false,
+									message: 'user_is_private',
+									type:type,
+									following_count: 0,
+									followers_count:0,
+									post: []
+								}
+								res.status(200).send(obj);
+							}
+						}
+
+
+					});
+					//res.sendStatus(200);
+				
+				}
+				else{
+					console.log('following');
+					var message='user_is_following';
+					var type= 'following';
+					getUserProfile(passed_user_id,message,type,token).then(function(result){
+						res.status(200).send(result);
+					}).catch(function(error){
+						console.log('promise rejected error: ', error);
+					})
+					
+					
+
+				}
+
+			});
+		}
+	});
+	
 });
 
 
@@ -798,6 +926,9 @@ app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 });
 
 
+///-----------------------------------------------------------------------------------///
+// ------------------------------FUNCTIONS--------------------------------------------//
+///----------------------------------------------------------------------------------///
 
 //verify login
 app.get('/user/login/test' , verifyHeader, verifyToken, async function (req,res)  {
@@ -976,6 +1107,7 @@ async function uploadThumbImage(uid, thumb_image_url,token){
 
 }
 
+//delete old profile pic
 async function deleteOldProfile(_fileName) {
     fileSys.unlink('./public/profile_images/' + _fileName, function (err) {
         if (err) {
@@ -983,4 +1115,91 @@ async function deleteOldProfile(_fileName) {
             throw err;
         }
     });
+}
+
+//get user profile (not current) 
+async function getUserProfile(passed_user_id, message,type,token){
+	
+
+	return new Promise(function(resolve,reject){
+
+		mysqlConnection.query('select post_image,pid from post where uid=?;',[passed_user_id],(err,rows)=>{
+
+			if(err){
+				console.log('error in query');
+				res.sendStatus(401);
+
+			}
+			else{
+			//
+			console.log('tokenn: ',token);
+			posts=[];
+			var following_count;
+			var followers_count;
+			Object.keys(rows).forEach(key => {
+				var singlePost=rows[key]
+				if (rows[key].post_image != null) {
+					singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
+					console.log('post image:   ', rows[key].post_image);
+				}
+				posts.push(singlePost);
+			
+			});
+			
+		
+		//get following count
+		mysqlConnection.query('select COUNT(following_uid) as following_count from follow WHERE follower_uid=?',[passed_user_id],(err, rows)=>{
+			if(err){
+				console.log('err in query 2');
+				var obj = {
+					error: true,
+					message: "Error: " + err
+				}
+				reject(obj);
+			}
+			else{
+				following_count= rows[0].following_count;
+				console.log('following count', following_count);
+			}
+
+		});
+
+		//get followers count
+		mysqlConnection.query('select COUNT(following_uid) as followers_count from follow WHERE following_uid=?',[passed_user_id],(err, rows)=>{
+			if(err){
+				console.log('err in query 2');
+				var obj = {
+					error: true,
+					message: "Error: " + err
+				}
+				reject(obj);
+			
+			}
+			else{
+				followers_count= rows[0].followers_count;
+				console.log('following count', followers_count);
+				
+		var obj= {
+			error: false,
+			message: message,
+			type: type,
+			following_count: following_count,
+			followers_count:followers_count,
+			post: posts
+		}
+		resolve(obj);
+			}
+
+		});
+
+
+			
+			}
+		});
+
+
+		
+	});
+
+
 }

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.provider.SyncStateContract;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -40,7 +41,7 @@ public class SettingsBlockedUsers extends AppCompatActivity {
     List<BlockedUsers.User> finalList;
     PreferenceManager preferenceManager;
     String token;
-    boolean listEnd = false;
+
     boolean noMoreResults = false;
 
 
@@ -53,6 +54,18 @@ public class SettingsBlockedUsers extends AppCompatActivity {
         backIcon = findViewById(R.id.settingsbu_backicon);
         closeBtn = findViewById(R.id.settingsbu_closebtn);
 
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsBlockedUsers.this.finish();
+            }
+        });
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsBlockedUsers.this.finish();
+            }
+        });
 
         token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         finalList = new ArrayList<>();

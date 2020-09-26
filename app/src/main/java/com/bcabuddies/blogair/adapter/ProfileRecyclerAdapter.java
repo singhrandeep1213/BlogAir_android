@@ -10,18 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.model.UserPosts;
+import com.bcabuddies.blogair.model.UserProfile;
 import com.bumptech.glide.Glide;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.List;
 
 public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileRecyclerAdapter.profileViewHolder> {
 
     private Context context;
-    private List<UserPosts> userPostList;
+    private List<UserProfile.Post> userPostList;
 
-    public ProfileRecyclerAdapter(Context context, List<UserPosts> userPostList) {
+    public ProfileRecyclerAdapter(Context context, List<UserProfile.Post> userPostList) {
         this.context = context;
         this.userPostList = userPostList;
     }

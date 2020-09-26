@@ -2,6 +2,7 @@ package com.bcabuddies.blogair.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.fragments.PostUserProfile;
+import com.bcabuddies.blogair.home.fragments.ProfileFragment;
+import com.bcabuddies.blogair.utils.Constants;
+import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bcabuddies.blogair.utils.TimeAgo;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bumptech.glide.Glide;
@@ -29,6 +36,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     private Context context;
     private List<HomeFeed.Post> homeFeedList = new ArrayList<>();
     private static final String TAG = "homeRecyclerAdapter";
+    Bundle bundle;
+    PreferenceManager preferenceManager;
 
 
     public homeRecyclerAdapter(Context context, List<HomeFeed.Post> homeFeedList) {
@@ -46,9 +55,16 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     @Override
     public void onBindViewHolder(@NonNull homeFeedViewHolder holder, int position) {
 
+        preferenceManager=new PreferenceManager(context);
         String pid= homeFeedList.get(position).getPid();
+        String postUid=homeFeedList.get(position).getUid();
+        String fullName= homeFeedList.get(position).getFull_name();
+
+        String currentUid=preferenceManager.getString(Constants.KEY_UID);
         String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
+        bundle=new Bundle();
+
 
         Glide.with(context)
                 .load(homeFeedList.get(position).getThumb_image())
@@ -83,6 +99,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 if (num > 4 ){
                     holder.moreTv.setVisibility(View.VISIBLE);
                 }
+
             }
         });
         holder.moreTv.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +127,34 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             holder.bookmarkUnselectedIcon.setVisibility(View.VISIBLE);
             holder.bookmarkSelectedIcon.setVisibility(View.GONE);
         }
+
+        //open user profile fragment
+        holder.fullName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if  (postUid.equals(currentUid)){
+                    Fragment fragment= ProfileFragment.newInstance();
+                    AppCompatActivity activity= (AppCompatActivity) v.getContext();
+                    activity.getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+
+                    Log.e(TAG, "onClick: current user: " );
+                }
+                else{
+                    bundle.putString("post_uid",postUid);
+                    bundle.putString("full_name",fullName);
+                    AppCompatActivity activity= (AppCompatActivity) v.getContext();
+                    Fragment fragment= PostUserProfile.newInstance();
+                    fragment.setArguments(bundle);
+                    activity.getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+
+
+                    Log.e(TAG, "onClick: not current user" );
+                }
+
+            }
+        });
+
+
 
     }
 

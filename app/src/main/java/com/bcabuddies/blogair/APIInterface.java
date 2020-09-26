@@ -3,9 +3,8 @@ package com.bcabuddies.blogair;
 import com.bcabuddies.blogair.model.BlockedUsers;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
-import com.bcabuddies.blogair.model.LoginUser;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
-import com.bcabuddies.blogair.model.UserPosts;
+import com.bcabuddies.blogair.model.UserProfile;
 import com.bcabuddies.blogair.utils.Constants;
 
 import java.util.List;
@@ -23,7 +22,6 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface APIInterface {
 
@@ -46,8 +44,8 @@ public interface APIInterface {
 
     //get all posts of the current logged in user (user profile)
     @Headers(Constants.KEY_HEADER)
-    @GET("/user/profile/posts/{uid}")
-    Call<List<UserPosts>> getUserPosts(@Header("authorization") String token, @Path("uid") String uid);
+    @GET("/user/current/profile/{uid}")
+    Call<UserProfile> getUserPosts(@Header("authorization") String token, @Path("uid") String uid);
 
     //add a new post
     @Headers(Constants.KEY_HEADER)
@@ -77,6 +75,13 @@ public interface APIInterface {
     @Headers(Constants.KEY_HEADER)
     @GET("/user/blocked/users")
     Call<BlockedUsers> getBlockedUsers(@Header("authorization") String token );
+
+    //get user profile (not current)
+    @Headers(Constants.KEY_HEADER)
+    @GET(("/user/post/profile/{puid}"))
+    Call<UserProfile> getUserProfile (@Header("authorization") String token, @Path("puid") String puid );
+
+
 
 
 /*
