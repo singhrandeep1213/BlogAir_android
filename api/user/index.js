@@ -15,8 +15,8 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 
-//const baseURL = 'https://myblogs.harshitaapptech.com/myblog/api/v3'; //live
-const baseURL = 'http://192.168.1.3:3000'; //local
+//const baseURL = 'https://myblogs.harshitaapptech.com/'; //live
+const baseURL = 'http://192.168.1.2:3000'; //local
 
 //databse connection
 var mysqlConnection= mysql.createConnection({
@@ -540,20 +540,44 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 								var is_bookmarked = result[0].is_bookmarked;
 								//console.log('bookmark id:  ', is_bookmarked);
 								singlePost.is_bookmarked=is_bookmarked;
+							    	console.log('current_pid :  ', rows[key].pid);
+								//get likes count
+								mysqlConnection.query('select count(lid) as likes_count, (select count(uid)  from likes where uid=? and pid=?) as is_liked_by_current_user from likes where pid=?',[uid,rows[key].pid,rows[key].pid], function(err,result){
+									if(err){
+										var obj = {
+											message: "Posts found",
+											error: false,
+											blog: allPosts
+										}
+		
+										res.status(200).send(obj)
+									}
+									else{
+										console.log('uid: ',uid);
+										var likes_count=result[0].likes_count;
+										var is_liked_by_current_user= result[0].is_liked_by_current_user;
+										console.log('is_liked_by_current_user:  ',is_liked_by_current_user );
+										singlePost.likes_count= likes_count;
+										singlePost.is_liked_by_current_user=is_liked_by_current_user;
+										allBlogs.push(singlePost);
 
-								allBlogs.push(singlePost);
+										var obj = {
+											message: "Posts found",
+											error: false,
+											post: allBlogs
+										}
+		
+										if (counter == exitCondition) {
+											res.status(200).send(obj);
+										}
+										counter++;
+										
+									}
 
-								var obj = {
-									message: "Posts found",
-									error: false,
-									post: allBlogs
-								}
+								});
 
-								if (counter == exitCondition) {
-									res.status(200).send(obj);
-								}
-								counter++;
-								
+
+							
 								//console.log('singlePost:  ',singlePost);
 								//console.log('rows:  ',rows);
 								

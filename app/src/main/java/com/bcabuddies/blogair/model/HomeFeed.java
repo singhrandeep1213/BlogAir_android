@@ -53,6 +53,9 @@ public class HomeFeed {
         @SerializedName("likes_count")
         int likes_count;
         @Expose
+        @SerializedName("is_liked_by_current_user")
+        int is_liked_by_current_user;
+        @Expose
         @SerializedName("time_stamp")
         Date time_stamp;
         @Expose
@@ -64,6 +67,14 @@ public class HomeFeed {
         @Expose
         @SerializedName("is_bookmarked")
         String is_bookmarked;
+
+        public int getIs_liked_by_current_user() {
+            return is_liked_by_current_user;
+        }
+
+        public void setIs_liked_by_current_user(int is_liked_by_current_user) {
+            this.is_liked_by_current_user = is_liked_by_current_user;
+        }
 
         public String getIs_bookmarked() {
             return is_bookmarked;

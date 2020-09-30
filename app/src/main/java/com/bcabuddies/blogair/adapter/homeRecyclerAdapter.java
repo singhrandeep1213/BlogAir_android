@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.fragments.CommentsFragment;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
 import com.bcabuddies.blogair.utils.Constants;
@@ -63,6 +64,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         String thumbImage=homeFeedList.get(position).getThumb_image();
         String currentUid=preferenceManager.getString(Constants.KEY_UID);
         String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
+        int is_liked_by_current_user=  homeFeedList.get(position).getIs_liked_by_current_user();
+        int likes_count= homeFeedList.get(position).getLikes_count();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
         bundle=new Bundle();
 
@@ -74,7 +77,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 .load(homeFeedList.get(position).getPost_image())
                 .into(holder.postImage);
         holder.fullName.setText(homeFeedList.get(position).getFull_name());
-        holder.likesCount.setText(String.valueOf(homeFeedList.get(position).getLikes_count()));
+        holder.likesCount.setText(String.valueOf(likes_count));
         holder.postDesc.setText(homeFeedList.get(position).getDesc());
         holder.postHeading.setText(homeFeedList.get(position).getPost_heading());
 
@@ -91,6 +94,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         else{
             holder.timeStamp.setText(timeAgo);
         }
+
 
         //set more and less view
         holder.postDesc.post(new Runnable() {
@@ -129,6 +133,15 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             holder.bookmarkSelectedIcon.setVisibility(View.GONE);
         }
 
+        //set like icon
+        if  (is_liked_by_current_user==1){
+            holder.likeSelectedIcon.setVisibility(View.VISIBLE);
+            holder.likeUnselectedIcon.setVisibility(View.GONE);
+        }else if(is_liked_by_current_user==0){
+            holder.likeUnselectedIcon.setVisibility(View.VISIBLE);
+            holder.likeSelectedIcon.setVisibility(View.GONE);
+        }
+
         //open user profile fragment
         holder.fullName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,7 +172,17 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             }
         });
 
+        holder.commentsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment= CommentsFragment.newInstance();
+                AppCompatActivity activity= (AppCompatActivity) v.getContext();
+                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
+                ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
+            }
+        });
 
     }
 
@@ -180,7 +203,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
     class homeFeedViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView dotsMenu, postImage, likeIcon, commentsIcon,bookmarkSelectedIcon, bookmarkUnselectedIcon;
+        ImageView dotsMenu, postImage, likeUnselectedIcon,likeSelectedIcon ,commentsIcon,bookmarkSelectedIcon, bookmarkUnselectedIcon;
         CircleImageView userThumb;
         TextView fullName, likesCount, postHeading, postDesc,timeStamp,moreTv,lessTv;
 
@@ -190,7 +213,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             userThumb = itemView.findViewById(R.id.home_row_thumb_icon);
             dotsMenu = itemView.findViewById(R.id.homerow_dots_menu);
             postImage = itemView.findViewById(R.id.homerow_post_image);
-            likeIcon = itemView.findViewById(R.id.homerow_like_icon);
+            likeUnselectedIcon = itemView.findViewById(R.id.homerow_like_icon);
+            likeSelectedIcon= itemView.findViewById(R.id.homerow_likeselesctedicon);
             commentsIcon = itemView.findViewById(R.id.homerow_comments_icon);
             fullName = itemView.findViewById(R.id.homerow_full_name);
             likesCount = itemView.findViewById(R.id.homerow_like_count);
