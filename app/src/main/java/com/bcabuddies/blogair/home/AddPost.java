@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.google.android.material.textfield.TextInputLayout;
@@ -117,11 +118,6 @@ public class AddPost extends AppCompatActivity {
     }
 
     private void callApi() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
 
         RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("multipart/form-data"), thumb_filePathUri);
         RequestBody pid= RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.pid);
@@ -131,10 +127,8 @@ public class AddPost extends AppCompatActivity {
         MultipartBody.Part mBody =
                 MultipartBody.Part.createFormData("post_image", thumb_filePathUri.getName(), requestFile);
 
-        
 
-
-        APIInterface jsonHomeFeedApi = retrofit.create(APIInterface.class);
+        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
         Call<ResponseBody> listCall = jsonHomeFeedApi.addNewPost("bearer " + token,pid,postDescription,mBody,postHeading );
 

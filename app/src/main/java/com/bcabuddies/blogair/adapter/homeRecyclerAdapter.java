@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,22 +17,30 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.fragments.CommentsFragment;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
+import com.bcabuddies.blogair.interfaces.PostClickListener;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bcabuddies.blogair.utils.TimeAgo;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bumptech.glide.Glide;
+import okhttp3.ResponseBody;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapter.homeFeedViewHolder> {
 
@@ -57,16 +66,20 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     @Override
     public void onBindViewHolder(@NonNull homeFeedViewHolder holder, int position) {
 
+
         preferenceManager=new PreferenceManager(context);
+        String token= preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         String pid= homeFeedList.get(position).getPid();
         String postUid=homeFeedList.get(position).getUid();
         String fullName= homeFeedList.get(position).getFull_name();
         String thumbImage=homeFeedList.get(position).getThumb_image();
         String currentUid=preferenceManager.getString(Constants.KEY_UID);
         String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
+        String postHeading=homeFeedList.get(position).getPost_heading();
         int is_liked_by_current_user=  homeFeedList.get(position).getIs_liked_by_current_user();
-        int likes_count= homeFeedList.get(position).getLikes_count();
+        int likes_count = homeFeedList.get(position).getLikes_count();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
+
         bundle=new Bundle();
 
 
@@ -77,9 +90,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 .load(homeFeedList.get(position).getPost_image())
                 .into(holder.postImage);
         holder.fullName.setText(homeFeedList.get(position).getFull_name());
-        holder.likesCount.setText(String.valueOf(likes_count));
         holder.postDesc.setText(homeFeedList.get(position).getDesc());
-        holder.postHeading.setText(homeFeedList.get(position).getPost_heading());
+        holder.postHeading.setText(postHeading);
 
         Log.e(TAG, "onBindViewHolder: pid: "+pid + "  is_bookmarked:  "+is_bookmarked);
 
@@ -175,12 +187,157 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         holder.commentsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bundle.putString("post_uid", postUid);
+                bundle.putString("pid",pid);
+                bundle.putString("likes_count", String.valueOf(likes_count));
+                bundle.putString("post_heading",postHeading);
                 Fragment fragment= CommentsFragment.newInstance();
+                fragment.setArguments(bundle);
                 AppCompatActivity activity= (AppCompatActivity) v.getContext();
                 FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
                 ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
                 ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
+            }
+        });
+
+        //like a post
+        holder.likeUnselectedIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.likeUnselectedIcon.setEnabled(false);
+                String lid= UUID.randomUUID().toString();
+                APIInterface postLikeApi= RetrofitManager.getRetrofit().create(APIInterface.class);
+                Call<ResponseBody> likeCall =postLikeApi.likePost("bearer " + token,lid,pid);
+
+                likeCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (!response.isSuccessful()){
+                            Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                            holder.likeUnselectedIcon.setEnabled(true);
+
+                        }
+                        else{
+                            Toast.makeText(context, "liked", Toast.LENGTH_SHORT).show();
+                            holder.likeUnselectedIcon.setVisibility(View.GONE);
+                            holder.likeSelectedIcon.setVisibility(View.VISIBLE);
+                            holder.likeUnselectedIcon.setEnabled(true);
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                        holder.likeUnselectedIcon.setEnabled(true);
+                    }
+                });
+
+            }
+        });
+
+        //unlike a post
+        holder.likeSelectedIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.likeSelectedIcon.setEnabled(false);
+
+                APIInterface postUnlikeApi= RetrofitManager.getRetrofit().create(APIInterface.class);
+                Call<ResponseBody> likeCall =postUnlikeApi.unlikePost("bearer " + token,pid);
+
+                likeCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (!response.isSuccessful()){
+                            Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                            holder.likeSelectedIcon.setEnabled(true);
+
+                        }
+                        else{
+                            Toast.makeText(context, "unliked", Toast.LENGTH_SHORT).show();
+                            holder.likeSelectedIcon.setVisibility(View.GONE);
+                            holder.likeUnselectedIcon.setVisibility(View.VISIBLE);
+                            holder.likeSelectedIcon.setEnabled(true);
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                        holder.likeSelectedIcon.setEnabled(true);
+                    }
+                });
+            }
+        });
+
+
+        //bookmark a post
+        holder.bookmarkUnselectedIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.bookmarkUnselectedIcon.setEnabled(false);
+                String bid= UUID.randomUUID().toString();
+                APIInterface postLikeApi= RetrofitManager.getRetrofit().create(APIInterface.class);
+                Call<ResponseBody> likeCall =postLikeApi.bookmarkPost("bearer " + token,bid,pid);
+
+                likeCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (!response.isSuccessful()){
+                            Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                            holder.bookmarkUnselectedIcon.setEnabled(true);
+                        }
+                        else{
+                            Toast.makeText(context, "bookmarked", Toast.LENGTH_SHORT).show();
+                            holder.bookmarkUnselectedIcon.setVisibility(View.GONE);
+                            holder.bookmarkSelectedIcon.setVisibility(View.VISIBLE);
+                            holder.bookmarkUnselectedIcon.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                        holder.bookmarkUnselectedIcon.setEnabled(true);
+                    }
+                });
+
+            }
+        });
+
+        //remove bookmark
+        holder.bookmarkSelectedIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.bookmarkSelectedIcon.setEnabled(false);
+
+                APIInterface postUnlikeApi= RetrofitManager.getRetrofit().create(APIInterface.class);
+                Call<ResponseBody> likeCall =postUnlikeApi.unBookmarkPost("bearer " + token,pid);
+
+                likeCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (!response.isSuccessful()){
+                            Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                            holder.bookmarkSelectedIcon.setEnabled(true);
+
+                        }
+                        else{
+                            Toast.makeText(context, "bookmark removed", Toast.LENGTH_SHORT).show();
+                            holder.bookmarkSelectedIcon.setVisibility(View.GONE);
+                            holder.bookmarkUnselectedIcon.setVisibility(View.VISIBLE);
+                            holder.bookmarkSelectedIcon.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                        holder.bookmarkSelectedIcon.setEnabled(true);
+                    }
+                });
             }
         });
 
@@ -201,11 +358,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         return position;
     }
 
-    class homeFeedViewHolder extends RecyclerView.ViewHolder {
+    public class homeFeedViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView dotsMenu, postImage, likeUnselectedIcon,likeSelectedIcon ,commentsIcon,bookmarkSelectedIcon, bookmarkUnselectedIcon;
+        public ImageView dotsMenu, postImage, likeUnselectedIcon,likeSelectedIcon ,commentsIcon,bookmarkSelectedIcon, bookmarkUnselectedIcon;
         CircleImageView userThumb;
-        TextView fullName, likesCount, postHeading, postDesc,timeStamp,moreTv,lessTv;
+        TextView fullName,  postHeading, postDesc,timeStamp,moreTv,lessTv;
 
         public homeFeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -217,7 +374,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             likeSelectedIcon= itemView.findViewById(R.id.homerow_likeselesctedicon);
             commentsIcon = itemView.findViewById(R.id.homerow_comments_icon);
             fullName = itemView.findViewById(R.id.homerow_full_name);
-            likesCount = itemView.findViewById(R.id.homerow_like_count);
+
             postHeading = itemView.findViewById(R.id.homerow_postheading);
             postDesc = itemView.findViewById(R.id.homerow_post_desc);
             timeStamp=itemView.findViewById(R.id.homerow_timestamp);

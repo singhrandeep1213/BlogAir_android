@@ -18,7 +18,9 @@ import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
 import com.bcabuddies.blogair.home.MainActivity;
+import com.bcabuddies.blogair.interfaces.PostClickListener;
 import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
@@ -38,7 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Use the {@link HomeFeedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFeedFragment extends Fragment {
+public class HomeFeedFragment extends Fragment  {
 
     private RecyclerView recyclerView;
     private com.bcabuddies.blogair.adapter.homeRecyclerAdapter homeRecyclerAdapter;
@@ -49,6 +51,8 @@ public class HomeFeedFragment extends Fragment {
     int pageCount = 1;
     boolean noMoreResults = false;
     boolean listEnd = false;
+
+
 
 
     public HomeFeedFragment() {
@@ -102,13 +106,13 @@ public class HomeFeedFragment extends Fragment {
 
 
 
+
         return view;
     }
 
     private void callApi(int pageNo) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
-        APIInterface jsonHomeFeedApi = retrofit.create(APIInterface.class);
+        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
         Call<HomeFeed> listCall = jsonHomeFeedApi.getHomeFeed("bearer " + token, pageNo);
 
@@ -160,5 +164,7 @@ public class HomeFeedFragment extends Fragment {
         HomeFeedFragment fragment = new HomeFeedFragment();
         return fragment;
     }
+
+
 
 }

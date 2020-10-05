@@ -18,6 +18,7 @@ import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.ProfileRecyclerAdapter;
 import com.bcabuddies.blogair.model.UserProfile;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bumptech.glide.Glide;
@@ -107,9 +108,8 @@ public class PostUserProfile extends Fragment {
 
     private void callAPi() {
 
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
         Log.e(TAG, "callAPi: token: "+token );
-        APIInterface userProfileApi= retrofit.create(APIInterface.class);
+        APIInterface userProfileApi= RetrofitManager.getRetrofit().create(APIInterface.class);
         Call<UserProfile> listCall= userProfileApi.getUserProfile("bearer " + token, postUid);
         listCall.enqueue(new Callback<UserProfile>() {
             @Override

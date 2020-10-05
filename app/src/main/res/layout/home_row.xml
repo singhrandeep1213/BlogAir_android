@@ -68,18 +68,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/home_row_thumb_icon" />
 
-    <TextView
-        android:id="@+id/homerow_like_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:padding="5dp"
-        android:text="@string/default_like_count"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/homerow_likeicon_layout"
-        app:layout_constraintLeft_toRightOf="@id/homerow_likeicon_layout"
-        app:layout_constraintTop_toBottomOf="@id/homerow_likeicon_layout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/homerow_likeicon_layout"

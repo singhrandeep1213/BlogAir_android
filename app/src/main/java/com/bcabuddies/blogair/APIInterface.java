@@ -1,5 +1,7 @@
 package com.bcabuddies.blogair;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.bcabuddies.blogair.model.BlockedUsers;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
@@ -81,6 +83,29 @@ public interface APIInterface {
     @GET(("/user/post/profile/{puid}"))
     Call<UserProfile> getUserProfile (@Header("authorization") String token, @Path("puid") String puid );
 
+    //like a post
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/like/post")
+    @FormUrlEncoded
+    Call<ResponseBody> likePost(@Header("authorization") String token, @Field("lid") String lid , @Field("pid") String pid);
+
+    //unlike a post
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/post/unlike")
+    @FormUrlEncoded
+    Call<ResponseBody> unlikePost(@Header("authorization") String token,  @Field("pid") String pid);
+
+    //bookmark a post
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/post/bookmark")
+    @FormUrlEncoded
+    Call<ResponseBody> bookmarkPost(@Header("authorization") String token, @Field("bid") String bid , @Field("pid") String pid);
+
+    //remove bookmark
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/post/unbookmark")
+    @FormUrlEncoded
+    Call<ResponseBody> unBookmarkPost(@Header("authorization") String token,  @Field("pid") String pid);
 
 
 

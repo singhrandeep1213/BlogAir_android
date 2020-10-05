@@ -950,6 +950,165 @@ app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 });
 
 
+//like a post
+app.post('/user/like/post', verifyHeader, verifyToken, upload.none(), async (req,res)=>{
+	
+
+	jwt.verify(req.token, SecretKey, async function(err,authData){
+
+		if(err){
+			console.log('user not authorized: ', err);
+			res.sendStatus(401);
+		}
+		else{
+			var data= req.body;
+			var lid= data.lid;
+			var pid= data.pid;
+			var uid= authData.user.id;
+			mysqlConnection.query('insert into likes(lid,pid,uid) values(?,?,?)', [lid,pid,uid] , async function(err, result){
+				if(err){
+					var obj ={
+						error: true,
+						message: 'error_in_like'
+					}
+					console.log('error in like: ', err);
+					res.status(500).send(obj);
+				}
+				else{
+					var obj={
+						error: false,
+						message :'successfully_liked'
+					}
+					console.log('like successful');
+					res.status(200).send(obj);
+				}
+
+			});
+
+
+		}
+
+	});
+
+});
+
+
+//unlike a post
+app.post('/user/post/unlike', verifyHeader,verifyToken, upload.none(), async(req,res)=>{
+
+	jwt.verify(req.token, SecretKey, async function(err, authData){
+
+		if(err){
+			console.log('user not verified');
+			res.status(401);
+		}
+		else{
+			var data= req.body;
+			var pid= data.pid;
+			var uid= authData.user.id;
+
+			mysqlConnection.query('delete from likes where pid=? AND uid =? ', [pid,uid],async function(err,rows){
+				if(err){
+					var obj={
+						error: true,
+						message: 'unable to dislike the post'
+					};
+					res.status(500).send(obj);
+				}
+				else{
+					console.log('unliked successful');
+					var obj={
+						error: false,
+						message: 'uliked_successfully'
+					};
+					res.status(200).send(obj);
+				}
+			} )
+
+		}
+
+	});
+
+});
+
+//bookmark a post
+app.post('/user/post/bookmark', verifyHeader,verifyToken, upload.none(), async(req,res)=>{
+
+	jwt.verify(req.token, SecretKey, async function(err, authData){
+
+		if(err){
+			console.log('user onot authorized');
+			res.status(401);
+		}
+		else{
+			var data=req.body;
+			var uid= authData.user.id;
+			var bid= data.bid;
+			var pid= data.pid;
+			mysqlConnection.query('insert into bookmarks(bid,pid,uid) values (?, ? ,?)',[bid,pid,uid], async function(err,rows){
+				if(err){
+					var obj ={
+						error: true,
+						message: 'error_in_bookmark'
+					}
+					console.log('error in bookmark: ', err);
+					res.status(500).send(obj);
+				}
+				else{
+					var obj={
+						error: false,
+						message :'successfully_bookmarked'
+					}
+					console.log('bookmark successful');
+					res.status(200).send(obj);
+				}
+
+			});
+		}
+
+	});
+
+});
+
+//remove a bookmark
+app.post('/user/post/unbookmark', verifyHeader,verifyToken, upload.none(), async(req,res)=>{
+
+	jwt.verify(req.token, SecretKey, async function(err, authData){
+
+		if(err){
+			console.log('user not verified');
+			res.status(401);
+		}
+		else{
+			var data= req.body;
+			var pid= data.pid;
+			var uid= authData.user.id;
+
+			mysqlConnection.query('delete from bookmarks where pid=? AND uid =? ', [pid,uid],async function(err,rows){
+				if(err){
+					var obj={
+						error: true,
+						message: 'unable to remove the bookmark'
+					};
+					res.status(500).send(obj);
+				}
+				else{
+					console.log('bookmark remove successful');
+					var obj={
+						error: false,
+						message: 'unbookmarked_successfully'
+					};
+					res.status(200).send(obj);
+				}
+			} )
+
+		}
+
+	});
+
+});
+
+
 ///-----------------------------------------------------------------------------------///
 // ------------------------------FUNCTIONS--------------------------------------------//
 ///----------------------------------------------------------------------------------///
