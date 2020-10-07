@@ -3,6 +3,8 @@ package com.bcabuddies.blogair;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bcabuddies.blogair.model.BlockedUsers;
+
+import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
@@ -107,6 +109,16 @@ public interface APIInterface {
     @FormUrlEncoded
     Call<ResponseBody> unBookmarkPost(@Header("authorization") String token,  @Field("pid") String pid);
 
+    //get comments of a post
+    @Headers(Constants.KEY_HEADER)
+    @GET(("/user/post/comments/{pid}"))
+    Call<Comments> getPostComments (@Header("authorization") String token, @Path("pid") String pid );
+
+    //add a comment for a post
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/post/addcomment/")
+    @FormUrlEncoded
+    Call<ResponseBody> addComment(@Header("authorization") String token, @Field("cid") String cid , @Field("pid") String pid, @Field("comment_description") String commentDesc);
 
 
 /*

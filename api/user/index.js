@@ -72,68 +72,191 @@ mysqlConnection.connect((err)=>{
 app.listen(3000,()=>console.log('express server is running at port no : 3000'),'192.168.4.159');
 
 
-//random uid test
-app.get('/randomuid',(req,res)=>{
-	var random_num= uuid.v4();
-	res.send(random_num);
-});
 
+//login User
+app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 
-//get all users
-app.get('/user',(req,res)=>{
-	mysqlConnection.query('SELECT * FROM user',(err,rows,fields)=>{
-		if(!err){
-			//o[key].push(rows);
-			
-			res.send(rows);
-		}
-		else
-			console.log(err);
-	})
-});
-
-
-
-//test text
-app.get('/testext',(req,res)=>{
-	res.send("this is a sample text from api");
+	if(req.key == HeaderKey){
+		var data =req.body;
+		var email_id= data.email_id;
+		var password =data.password;
+		console.log('req:  ',req.body);
+		console.log('email:  ', email_id);
+		console.log('password:  ',password);
+		console.log("header key: ",req.key)
+		mysqlConnection.query('select full_name,uid,password, thumb_image, bio from user where email_id = ?' , [email_id] , async function(err, rows) {
+	
+			if(!!err){
+				console.log('error in email check query');
+			var obj ={
+				message: 'Server error , please try again',
+				error: true
+			}
+			res.status(502).json(obj);
+			}
+			else{
+				if (rows.length == 0) {
+					var obj = {
+						message: 'No user found with this email',
+						error: true
+					}
+					res.status(401).json(obj)
+				}
+	
+				else{
+					console.log("----------------------");
+					console.log("User login querry result ",rows);
+					console.log("----------------------");
+					try{
+						if (password== rows[0].password){
+							const user ={
+								id: rows[0].uid,
+								email_id:email_id,
+								full_name:rows[0].full_name
+							}
+	
+							jwt.sign({user :user}, SecretKey, async (err, token)=>{
+								if(!!err){
+									console.log('error creating token ', err);
+	
+										const obj = [{
+											message: 'Login failed',
+											error: true,
+											token: null
+										}];
+										res.status(400).send(obj);
+								}
+								else{
+									var thumb_image = baseURL + "/user/thumbimage/" + token + "/" + rows[0].thumb_image;
+									const obj ={
+										message :'login success',
+										error: false,
+										token: token,
+										name: rows[0].full_name,
+										thumb_image:thumb_image,
+										uid: rows[0].uid,
+										bio: rows[0].bio
+									};
+	
+	
+									console.log("----------------------");
+									console.log(obj);
+									console.log("----------------------");
+									res.status(200).json(obj);
+								}
+	
+							})
+	
+						}
+						else{
+							var obj = {
+								message: 'Invalid credentials',
+								error: true
+							}
+							res.sendStatus(401);
+						}
+					}
+					catch (e){
+						console.log('exception in password check');
+						var obj = {
+							message: 'Server error, please try again',
+							error: true
+						}
+						res.status(500).json(obj);
+					}
+				}
+			}
+	
+		});
 	}
+	else {
+        res.status(400).send();
+    }
+});
+
+//register a user pass full_name, email_id, password, uid
+app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
+
+	if(req.key==HeaderKey){
+		var data=req.body;
+		var full_name= data.full_name;
+		var email_id=data.email_id;
+		var password=data.password;
+		var uid=data.uid;
+
+		//change this while live server
+		var thumb_image=baseURL + "/user/defaultthumbimage/" + 'default_thumb_image.png';
+		console.log('register request: ');
+		console.log('full_naame:  ', full_name);
+		console.log('email_id:  ',email_id);
+		console.log('password:  ',password);
+		
+		mysqlConnection.query('insert into user(uid,email_id,full_name,password) values (?,?,?,?)' ,[uid,email_id,full_name,password], async function(err,rows) {
+			if(!err){
+				const user ={
+					id: uid,
+					email_id:email_id,
+					full_name:full_name
+				}
+
+				jwt.sign({user :user}, SecretKey, async (err, token)=>{
+					if(!!err){
+						console.log('error creating token ', err);
+							const obj = [{
+								message: 'register failed',
+								error: true,
+								token: null
+							}];
+							res.status(400).send(obj);
+					}
+					else{
+						const obj ={
+							message :'register success',
+							error: false,
+							token: token,
+							name: full_name,
+							thumb_image:thumb_image,
+							uid: uid
+						};
+					//change this to blogair user while live server
+					var fid=uuid.v4();
+						mysqlConnection.query('insert into follow(fid,follower_uid,following_uid ) values(?,?,"1") ' , [fid,uid], async function(err,rows){
+							if(!err){
+								console.log('followed user 1 successfully');
+								
+							}
+							else{
+								console.log('error while following 1: ',err);
+							}
+						} )  
+						
+						console.log("----------------------");
+						console.log(obj);
+						console.log("----------------------");
+						res.status(200).json(obj);
+					}
+
+				})
+
+			}
+			else{
+					if(err.code == 'ER_DUP_ENTRY'){
+						res.status(406).send();
+						console.log('error in register:  ',err.code);
+					}
+					console.log('error while register:  ',err)
+				
+			}
+		} )
 	
-	);
-	
 
-//get specific user
-app.get('/user/:uid',(req,res)=>{
-	mysqlConnection.query('SELECT * FROM user where uid= ? ',[req.params.uid],(err,rows,fields)=>{
-		if(!err)
-			res.send(rows);
-		else
-			console.log(err);
-	})
+	}
+	else {
+        res.status(400).send();
+    }
+
 });
 
-
-//delete a user with provided uid
-app.delete('/user/:uid',(req,res)=>{
-	mysqlConnection.query('delete from user WHERE uid= ?',[req.params.uid],(err,rows,fields)=>{
-		if(!err)
-			res.send('Deleted seccessfully');
-		else
-			console.log(err);
-	})
-});
-
-//insert and update  a user
-app.post('/user',(req,res)=>{
-		let usr=req.body;
-		 var sql = "CALL UserAddOrEdit(?,?,?,?,?,?,?);"; 
-		mysqlConnection.query(sql,[usr.uid,usr.email_id,usr.thumb_image,usr.full_name,usr.country,usr.dob,usr.time_stamp],(err,rows,fields)=>{
-			if(!err)
-				res.send('updated seccessfully');
-			else
-				console.log(err);
-	})
-});
 
 //add or edit name or user bio
 app.post('/user/update/nameandbio',verifyHeader,verifyToken, upload.none(), async(req,res)=>{
@@ -285,104 +408,6 @@ app.post('/user/post/addnew',verifyHeader,verifyToken,  uploadPostImage.single('
 		}
 	});
 });
-
-
-
-//register a user pass full_name, email_id, password, uid
-app.post('/user/register',upload.none(),verifyHeader, async (req,res) =>{
-
-	if(req.key==HeaderKey){
-		var data=req.body;
-		var full_name= data.full_name;
-		var email_id=data.email_id;
-		var password=data.password;
-		var uid=data.uid;
-
-		//change this while live server
-		var thumb_image=baseURL + "/user/defaultthumbimage/" + 'default_thumb_image.png';
-		console.log('register request: ');
-		console.log('full_naame:  ', full_name);
-		console.log('email_id:  ',email_id);
-		console.log('password:  ',password);
-		
-		mysqlConnection.query('insert into user(uid,email_id,full_name,password) values (?,?,?,?)' ,[uid,email_id,full_name,password], async function(err,rows) {
-			if(!err){
-				const user ={
-					id: uid,
-					email_id:email_id,
-					full_name:full_name
-				}
-
-				jwt.sign({user :user}, SecretKey, async (err, token)=>{
-					if(!!err){
-						console.log('error creating token ', err);
-							const obj = [{
-								message: 'register failed',
-								error: true,
-								token: null
-							}];
-							res.status(400).send(obj);
-					}
-					else{
-						const obj ={
-							message :'register success',
-							error: false,
-							token: token,
-							name: full_name,
-							thumb_image:thumb_image,
-							uid: uid
-						};
-					//change this to blogair user while live server
-					var fid=uuid.v4();
-						mysqlConnection.query('insert into follow(fid,follower_uid,following_uid ) values(?,?,"1") ' , [fid,uid], async function(err,rows){
-							if(!err){
-								console.log('followed user 1 successfully');
-								
-							}
-							else{
-								console.log('error while following 1: ',err);
-							}
-						} )  
-						
-						console.log("----------------------");
-						console.log(obj);
-						console.log("----------------------");
-						res.status(200).json(obj);
-					}
-
-				})
-
-			}
-			else{
-					if(err.code == 'ER_DUP_ENTRY'){
-						res.status(406).send();
-						console.log('error in register:  ',err.code);
-					}
-					console.log('error while register:  ',err)
-				
-			}
-		} )
-	
-
-	}
-	else {
-        res.status(400).send();
-    }
-
-});
-
-
-//get all posts
-app.get('/post',(req,res)=>{
-	mysqlConnection.query('SELECT * FROM post',(err,rows,fields)=>{
-		if(!err)
-			res.send(rows);
-		else
-			console.log(err);
-	})
-});
-
-
 
  //get all posts of current logged in user (i.e. user profile)
 app.get('/user/current/profile/:uid',verifyHeader,verifyToken,(req,res)=>{
@@ -848,106 +873,111 @@ app.get('/user/blocked/users',verifyHeader, verifyToken,function(req,res){
 
 });
 
-//login User
-app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
+//add commnet on a post
+app.post('/user/post/addcomment/', verifyHeader, verifyToken,upload.none(), async(req,res)=>{
 
-	if(req.key == HeaderKey){
-		var data =req.body;
-		var email_id= data.email_id;
-		var password =data.password;
-		console.log('req:  ',req.body);
-		console.log('email:  ', email_id);
-		console.log('password:  ',password);
-		console.log("header key: ",req.key)
-		mysqlConnection.query('select full_name,uid,password, thumb_image, bio from user where email_id = ?' , [email_id] , async function(err, rows) {
-	
-			if(!!err){
-				console.log('error in email check query');
-			var obj ={
-				message: 'Server error , please try again',
-				error: true
-			}
-			res.status(502).json(obj);
-			}
-			else{
-				if (rows.length == 0) {
-					var obj = {
-						message: 'No user found with this email',
-						error: true
+	jwt.verify(req.token, SecretKey, async function(err,authData){
+		if(err){
+			res.sendStatus(401);
+		}
+		else{
+			var data= req.body;
+			var cid= data.cid;
+			var pid= data.pid;
+			var uid= authData.user.id;
+			var comment_description= data.comment_description;
+			mysqlConnection.query('insert into comments(cid,pid,uid,comment_description) values(?,?,?,?)',[cid,pid,uid,comment_description],async function(err, result){
+				if(err){
+					var obj ={
+						error: true,
+						message: 'error_in_comment'
 					}
-					res.status(401).json(obj)
+					console.log('error in comment: ', err);
+					res.status(500).send(obj);
 				}
-	
 				else{
-					console.log("----------------------");
-					console.log("User login querry result ",rows);
-					console.log("----------------------");
-					try{
-						if (password== rows[0].password){
-							const user ={
-								id: rows[0].uid,
-								email_id:email_id,
-								full_name:rows[0].full_name
-							}
-	
-							jwt.sign({user :user}, SecretKey, async (err, token)=>{
-								if(!!err){
-									console.log('error creating token ', err);
-	
-										const obj = [{
-											message: 'Login failed',
-											error: true,
-											token: null
-										}];
-										res.status(400).send(obj);
-								}
-								else{
-									var thumb_image = baseURL + "/user/thumbimage/" + token + "/" + rows[0].thumb_image;
-									const obj ={
-										message :'login success',
-										error: false,
-										token: token,
-										name: rows[0].full_name,
-										thumb_image:thumb_image,
-										uid: rows[0].uid,
-										bio: rows[0].bio
-									};
-	
-	
-									console.log("----------------------");
-									console.log(obj);
-									console.log("----------------------");
-									res.status(200).json(obj);
-								}
-	
-							})
-	
-						}
-						else{
-							var obj = {
-								message: 'Invalid credentials',
-								error: true
-							}
-							res.sendStatus(401);
-						}
+					var obj={
+						error: false,
+						message :'commented_successfully'
 					}
-					catch (e){
-						console.log('exception in password check');
-						var obj = {
-							message: 'Server error, please try again',
-							error: true
-						}
-						res.status(500).json(obj);
-					}
+					console.log('comment post successful');
+					res.status(200).send(obj);
 				}
-			}
-	
-		});
-	}
-	else {
-        res.status(400).send();
-    }
+			});
+
+
+
+		}
+
+	});
+
+
 });
+
+//get comments of a post
+app.get('/user/post/comments/:pid',verifyHeader,verifyToken,function(req,res){
+
+	jwt.verify(req.token,SecretKey, async function(err,authData){
+		if(err){
+			console.log('user not verified');
+			res.status(401);
+		}
+		else{
+			var pid=req.params.pid;
+			mysqlConnection.query('select c.cid,c.comment_description, c.created_on, u.uid, u.thumb_image, u.full_name from comments c inner join user u on c.uid=u.uid where c.pid=? order by created_on asc',[pid], async function(err,rows){
+				if	(err){
+					console.log('error while getting: ', err);
+				}
+				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
+					console.log('error here1');
+					//no comment found
+					var obj={
+						error: false,
+						message: 'no_comment_found',
+						comments: []
+					}
+					res.status(200).send(obj);
+				}
+				else{
+					var token=req.token;
+					console.log('error here 2');
+					var comments = []
+                	var counter = 0;
+                   	var exitCondition = rows.length - 1
+
+					Object.keys(rows).forEach(key => {
+						var singleUser=rows[key];
+						if (rows[key].thumb_image != null) {
+							singleUser.thumb_image=baseURL + "/user/thumbimage/" + token + "/" + rows[key].thumb_image;
+							//console.log('post image:   ', rows[key].post_image);
+						}
+						comments.push(singleUser);
+						var obj={
+							error: false,
+							message: 'comments_found',
+							comments: comments
+						}
+						if (counter == exitCondition) {
+							res.status(200).send(obj);
+						}
+						counter++;
+					});
+				
+				
+				}
+
+
+
+			});
+		
+
+		
+		}
+
+	});
+
+});
+
 
 
 //like a post
@@ -1107,6 +1137,9 @@ app.post('/user/post/unbookmark', verifyHeader,verifyToken, upload.none(), async
 	});
 
 });
+
+
+
 
 
 ///-----------------------------------------------------------------------------------///
