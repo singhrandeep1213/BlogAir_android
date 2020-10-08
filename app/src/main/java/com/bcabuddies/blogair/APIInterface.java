@@ -120,6 +120,11 @@ public interface APIInterface {
     @FormUrlEncoded
     Call<ResponseBody> addComment(@Header("authorization") String token, @Field("cid") String cid , @Field("pid") String pid, @Field("comment_description") String commentDesc);
 
+    //remove a post
+    //get comments of a post
+    @Headers(Constants.KEY_HEADER)
+    @GET(("/user/post/removepost/{pid}"))
+    Call<ResponseBody> removePost(@Header("authorization") String token, @Path("pid") String pid );
 
 /*
     //test jwt auth token

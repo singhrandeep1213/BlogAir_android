@@ -522,7 +522,7 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 				start_limit=(page_no - 1) * 5 ; 
 			}
 			
-			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,data_limit],(err,rows,fields)=>{
+			mysqlConnection.query('select u.full_name, u.thumb_image,p.* from user u JOIN post p on p.uid=u.uid WHERE u.uid in (SELECT uid FROM post where uid = ? OR uid in (select following_uid from follow WHERE `follower_uid` = ?) ORDER BY p.time_stamp desc ) and p.is_deleted = 0 ORDER BY `p`.`time_stamp` DESC limit ?,?',[uid,uid,start_limit,data_limit],(err,rows,fields)=>{
 				if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
 					//No more posts
 					console.log('Error while getting posts: ', err);
@@ -1138,7 +1138,61 @@ app.post('/user/post/unbookmark', verifyHeader,verifyToken, upload.none(), async
 
 });
 
+//remove a post
+app.get('/user/post/removepost/:pid', verifyHeader, verifyToken,upload.none(),function(req,res){
 
+	jwt.verify(req.token, SecretKey, async function(err,authData){
+		if(err){
+			res.sendStatus(401);
+		}
+		else{
+			var uid = authData.user.id;
+			var pid = req.params.pid;
+			var isDeleted=0;
+			console.log('remove pid:' , pid);
+			mysqlConnection.query('SELECT pid, uid FROM post WHERE pid = ? AND is_deleted = ?', [pid, isDeleted],
+                function (err, rows) {
+                    if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
+                        //blog not found
+                        console.log('error in getting posts ', err);
+                        var obj = {
+                            error: true,
+                            message: "post_not_found"
+                        }
+                        res.status(200).send(obj);
+                    } else {
+                        //post found
+                        isDeleted = 1;
+
+                        if (uid == rows[0].uid) {
+
+                            mysqlConnection.query('UPDATE post SET `is_deleted` = ?, `deleted_on` = ? WHERE pid = ?',
+                                [isDeleted, new Date(), pid],
+                                function (err, rows) {
+                                    if (err) {
+                                        //error in query
+                                        console.log('error in deleting blog ', err);
+                                        res.status(502).send()
+                                    } else {
+                                        var obj = {
+                                            error: false,
+                                            message: "post_removed"
+                                        }
+                                        res.status(200).send(obj);
+                                    }
+                                })
+
+                        } else {
+                            res.status(401).send()
+                        }
+
+                    }
+                });
+		}
+
+	});
+
+});
 
 
 

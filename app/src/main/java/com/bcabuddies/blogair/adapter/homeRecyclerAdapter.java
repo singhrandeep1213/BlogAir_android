@@ -1,13 +1,19 @@
 package com.bcabuddies.blogair.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,14 +28,12 @@ import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.fragments.CommentsFragment;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
-import com.bcabuddies.blogair.interfaces.PostClickListener;
+import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bcabuddies.blogair.utils.TimeAgo;
-import com.bcabuddies.blogair.model.HomeFeed;
 import com.bumptech.glide.Glide;
-import okhttp3.ResponseBody;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +42,7 @@ import java.util.List;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -67,20 +72,20 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
     public void onBindViewHolder(@NonNull homeFeedViewHolder holder, int position) {
 
 
-        preferenceManager=new PreferenceManager(context);
-        String token= preferenceManager.getString(Constants.KEY_JWT_TOKEN);
-        String pid= homeFeedList.get(position).getPid();
-        String postUid=homeFeedList.get(position).getUid();
-        String fullName= homeFeedList.get(position).getFull_name();
-        String thumbImage=homeFeedList.get(position).getThumb_image();
-        String currentUid=preferenceManager.getString(Constants.KEY_UID);
-        String is_bookmarked=homeFeedList.get(position).getIs_bookmarked();
-        String postHeading=homeFeedList.get(position).getPost_heading();
-        int is_liked_by_current_user=  homeFeedList.get(position).getIs_liked_by_current_user();
+        preferenceManager = new PreferenceManager(context);
+        String token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
+        String pid = homeFeedList.get(position).getPid();
+        String postUid = homeFeedList.get(position).getUid();
+        String fullName = homeFeedList.get(position).getFull_name();
+        String thumbImage = homeFeedList.get(position).getThumb_image();
+        String currentUid = preferenceManager.getString(Constants.KEY_UID);
+        String is_bookmarked = homeFeedList.get(position).getIs_bookmarked();
+        String postHeading = homeFeedList.get(position).getPost_heading();
+        int is_liked_by_current_user = homeFeedList.get(position).getIs_liked_by_current_user();
         int likes_count = homeFeedList.get(position).getLikes_count();
         Date timeStamp = homeFeedList.get(position).getTime_stamp();
 
-        bundle=new Bundle();
+        bundle = new Bundle();
 
 
         Glide.with(context)
@@ -98,12 +103,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         //set time stamp
         long timeInMili = timeStamp.getTime();
         String timeAgo = TimeAgo.getTimeAgo(timeInMili);
-        if (timeAgo == "ADD_DATE"){
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMMM" + ", "+"EEE");
+        if (timeAgo == "ADD_DATE") {
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMMM" + ", " + "EEE");
             final StringBuilder nowMMDDYYYY = new StringBuilder(dateformatMMDDYYYY.format(timeStamp));
             holder.timeStamp.setText(nowMMDDYYYY.toString());
-        }
-        else{
+        } else {
             holder.timeStamp.setText(timeAgo);
         }
 
@@ -158,24 +162,23 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         holder.fullName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if  (postUid.equals(currentUid)){
-                    Fragment fragment= ProfileFragment.newInstance();
-                    AppCompatActivity activity= (AppCompatActivity) v.getContext();
+                if (postUid.equals(currentUid)) {
+                    Fragment fragment = ProfileFragment.newInstance();
+                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
                     FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
+                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left, R.anim.enter_left_to_right, R.anim.exit_left_to_right);
                     ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
-                    Log.e(TAG, "onClick: current user: " );
-                }
-                else{
-                    bundle.putString("post_uid",postUid);
-                    bundle.putString("full_name",fullName);
-                    bundle.putString("thumb_image",thumbImage);
-                    AppCompatActivity activity= (AppCompatActivity) v.getContext();
-                    Fragment fragment= PostUserProfile.newInstance();
+                    Log.e(TAG, "onClick: current user: ");
+                } else {
+                    bundle.putString("post_uid", postUid);
+                    bundle.putString("full_name", fullName);
+                    bundle.putString("thumb_image", thumbImage);
+                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                    Fragment fragment = PostUserProfile.newInstance();
                     fragment.setArguments(bundle);
                     FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
+                    ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left, R.anim.enter_left_to_right, R.anim.exit_left_to_right);
                     ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
 
                     Log.e(TAG, "onClick: not current user" );
@@ -213,12 +216,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 likeCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
                             holder.likeUnselectedIcon.setEnabled(true);
 
-                        }
-                        else{
+                        } else {
                             Toast.makeText(context, "liked", Toast.LENGTH_SHORT).show();
                             holder.likeUnselectedIcon.setVisibility(View.GONE);
                             holder.likeSelectedIcon.setVisibility(View.VISIBLE);
@@ -249,12 +251,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 likeCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
                             holder.likeSelectedIcon.setEnabled(true);
 
-                        }
-                        else{
+                        } else {
                             Toast.makeText(context, "unliked", Toast.LENGTH_SHORT).show();
                             holder.likeSelectedIcon.setVisibility(View.GONE);
                             holder.likeUnselectedIcon.setVisibility(View.VISIBLE);
@@ -285,11 +286,10 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 likeCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
                             holder.bookmarkUnselectedIcon.setEnabled(true);
-                        }
-                        else{
+                        } else {
                             Toast.makeText(context, "bookmarked", Toast.LENGTH_SHORT).show();
                             holder.bookmarkUnselectedIcon.setVisibility(View.GONE);
                             holder.bookmarkSelectedIcon.setVisibility(View.VISIBLE);
@@ -319,12 +319,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 likeCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
                             holder.bookmarkSelectedIcon.setEnabled(true);
 
-                        }
-                        else{
+                        } else {
                             Toast.makeText(context, "bookmark removed", Toast.LENGTH_SHORT).show();
                             holder.bookmarkSelectedIcon.setVisibility(View.GONE);
                             holder.bookmarkUnselectedIcon.setVisibility(View.VISIBLE);
@@ -338,6 +337,94 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                         holder.bookmarkSelectedIcon.setEnabled(true);
                     }
                 });
+            }
+        });
+
+        //popup menu
+        holder.dotsMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG, "onClick: dots clicked");
+                final PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.setForceShowIcon(true);
+                MenuInflater inflater = popupMenu.getMenuInflater();
+                if (postUid.equals(currentUid)) {
+                    Log.e(TAG, "onClick: dots if");
+                    inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
+                } else {
+                    Log.e(TAG, "onClick: dots else");
+                    inflater.inflate(R.menu.report_menu, popupMenu.getMenu());
+                }
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete_menu_btn:
+                                final AlertDialog alertDialog;
+                                alertDialog = new Builder(context)
+                                        .setMessage("Delete this post?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Log.e(TAG, "onClick: pid: " + pid);
+                                                callRemovePostApi(token, pid);
+                                                Toast.makeText(context, "Yes clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Toast.makeText(context, "No clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .show();
+                                Toast.makeText(context, "delete clicked", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.report_menu_btn:
+                                Toast.makeText(context, "Report clicked", Toast.LENGTH_SHORT).show();
+                                break;
+
+                        }
+                        return false;
+                    }
+                });
+
+                popupMenu.show();
+
+            }
+        });
+
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG, "onClick: pid: " + pid);
+            }
+        });
+
+
+    }
+
+    private void callRemovePostApi(String token, String pid) {
+        Log.e(TAG, "callRemovePostApi: pid: " + pid);
+        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+
+        Call<ResponseBody> removePost = jsonHomeFeedApi.removePost("bearer " + token, pid);
+
+        removePost.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Post Removed", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
             }
         });
 
