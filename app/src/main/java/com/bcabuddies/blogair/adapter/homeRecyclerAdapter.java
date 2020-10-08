@@ -368,7 +368,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 Log.e(TAG, "onClick: pid: " + pid);
-                                                callRemovePostApi(token, pid);
+                                                callRemovePostApi(token, pid,position);
                                                 Toast.makeText(context, "Yes clicked", Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -405,7 +405,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
     }
 
-    private void callRemovePostApi(String token, String pid) {
+    private void callRemovePostApi(String token, String pid, int position) {
         Log.e(TAG, "callRemovePostApi: pid: " + pid);
         APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
@@ -417,7 +417,8 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 if (!response.isSuccessful()) {
                     Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "Post Removed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Post Deleted", Toast.LENGTH_SHORT).show();
+                    homeFeedList.remove(position);
                     notifyDataSetChanged();
                 }
             }

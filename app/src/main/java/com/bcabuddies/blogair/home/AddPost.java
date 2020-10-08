@@ -2,17 +2,12 @@ package com.bcabuddies.blogair.home;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
-
-
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,32 +15,22 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.google.android.material.textfield.TextInputLayout;
-import com.squareup.okhttp.MediaType;
-
-import okhttp3.RequestBody;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
-import org.apache.commons.io.FileUtils;
 
-import id.zelory.compressor.Compressor;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 

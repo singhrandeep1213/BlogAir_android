@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,12 +57,13 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
         preferenceManager=new PreferenceManager(context);
         String currentUid=preferenceManager.getString(Constants.KEY_UID);
         bundle=new Bundle();
-
-        String thumbImageUrl, fullName, commentDescription, commentUid;
-        thumbImageUrl=commentsList.get(position).getThumb_image();
-        fullName=commentsList.get(position).getFull_name();
-        commentDescription=commentsList.get(position).getComment_description();
-        commentUid=commentsList.get(position).getUid();
+        preferenceManager = new PreferenceManager(context);
+        String token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
+        String cid = commentsList.get(position).getCid();
+        String thumbImageUrl=commentsList.get(position).getThumb_image();
+        String fullName=commentsList.get(position).getFull_name();
+        String  commentDescription=commentsList.get(position).getComment_description();
+        String  commentUid=commentsList.get(position).getUid();
 
         try {
             Glide.with(context).load(thumbImageUrl).into(holder.thumb_image_view);
@@ -71,6 +74,7 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
         holder.full_name_tv.setText(fullName);
         holder.comment_desc.setText(commentDescription);
 
+        //open user profile
         holder.full_name_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +103,25 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
             }
         });
 
+        //set dots menu
+        holder.dots_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG, "onClick: dots clicked");
+                final PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.setForceShowIcon(true);
+                MenuInflater inflater = popupMenu.getMenuInflater();
+                if (commentUid.equals(currentUid)) {
+                    Log.e(TAG, "onClick: dots if");
+                    inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
+                } else {
+                    Log.e(TAG, "onClick: dots else");
+                    inflater.inflate(R.menu.report_menu, popupMenu.getMenu());
+                }
+
+                popupMenu.show();
+            }
+        });
 
     }
 
