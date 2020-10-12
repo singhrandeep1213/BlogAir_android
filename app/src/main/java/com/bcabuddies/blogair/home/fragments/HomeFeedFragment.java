@@ -1,12 +1,10 @@
 package com.bcabuddies.blogair.home.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,11 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
-import com.bcabuddies.blogair.home.MainActivity;
-import com.bcabuddies.blogair.interfaces.PostClickListener;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
-import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
@@ -31,8 +26,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -48,23 +41,31 @@ public class HomeFeedFragment extends Fragment  {
     List<com.bcabuddies.blogair.model.HomeFeed.Post> finalList;
     PreferenceManager preferenceManager;
     String token, uid, fullName;
-    int pageCount = 1;
-    boolean noMoreResults = false;
+    public  int pageCount = 1;
+    public  boolean noMoreResults = false;
     boolean listEnd = false;
-
-
+    View   view;
 
 
     public HomeFeedFragment() {
         //required empty constructure
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+     
+
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView: called");
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_feed, container, false);
+        view = inflater.inflate(R.layout.fragment_home_feed, container, false);
 
 
         preferenceManager = new PreferenceManager(getActivity());
@@ -103,7 +104,6 @@ public class HomeFeedFragment extends Fragment  {
                 }
             }
         });
-
 
 
 

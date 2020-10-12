@@ -16,6 +16,17 @@ public class Comments {
     @Expose
     @SerializedName("message")
     private String message;
+    @Expose
+    @SerializedName("post_likes_count")
+    private String post_likes_count;
+
+    public String getPost_likes_count() {
+        return post_likes_count;
+    }
+
+    public void setPost_likes_count(String post_likes_count) {
+        this.post_likes_count = post_likes_count;
+    }
 
     public List<Comments.comments> getComments() {
         return comments;

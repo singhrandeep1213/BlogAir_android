@@ -409,6 +409,62 @@ app.post('/user/post/addnew',verifyHeader,verifyToken,  uploadPostImage.single('
 	});
 });
 
+//remove a post
+app.get('/user/post/removepost/:pid', verifyHeader, verifyToken,upload.none(),function(req,res){
+
+	jwt.verify(req.token, SecretKey, async function(err,authData){
+		if(err){
+			res.sendStatus(401);
+		}
+		else{
+			var uid = authData.user.id;
+			var pid = req.params.pid;
+			var isDeleted=0;
+			console.log('remove pid:' , pid);
+			mysqlConnection.query('SELECT pid, uid FROM post WHERE pid = ? AND is_deleted = ?', [pid, isDeleted],
+                function (err, rows) {
+                    if (!rows || rows == null || rows === null || rows[0] === null || !rows[0]) {
+                        //blog not found
+                        console.log('error in getting posts ', err);
+                        var obj = {
+                            error: true,
+                            message: "post_not_found"
+                        }
+                        res.status(200).send(obj);
+                    } else {
+                        //post found
+                        isDeleted = 1;
+
+                        if (uid == rows[0].uid) {
+
+                            mysqlConnection.query('UPDATE post SET `is_deleted` = ?, `deleted_on` = ? WHERE pid = ?',
+                                [isDeleted, new Date(), pid],
+                                function (err, rows) {
+                                    if (err) {
+                                        //error in query
+                                        console.log('error in deleting blog ', err);
+                                        res.status(502).send()
+                                    } else {
+                                        var obj = {
+                                            error: false,
+                                            message: "post_removed"
+                                        }
+                                        res.status(200).send(obj);
+                                    }
+                                })
+
+                        } else {
+                            res.status(401).send()
+                        }
+
+                    }
+                });
+		}
+
+	});
+
+});
+
  //get all posts of current logged in user (i.e. user profile)
 app.get('/user/current/profile/:uid',verifyHeader,verifyToken,(req,res)=>{
 
@@ -931,12 +987,34 @@ app.get('/user/post/comments/:pid',verifyHeader,verifyToken,function(req,res){
 				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
 					console.log('error here1');
 					//no comment found
-					var obj={
-						error: false,
-						message: 'no_comment_found',
-						comments: []
-					}
-					res.status(200).send(obj);
+
+					//likes count
+					mysqlConnection.query('select count(lid) as post_likes_count from likes where pid=? ',[pid], async function(err, result){
+
+						if(err){
+							var post_likes_count=result[0].post_likes_count;
+							var obj={
+								likes_count:likes_count,
+								error: false,
+								message: 'no_comment_found',
+								comments: []
+							}
+							res.status(200).send(obj);
+					
+						}
+						else{
+							var post_likes_count=result[0].post_likes_count;
+							var obj={
+								post_likes_count:post_likes_count,
+								error: false,
+								message: 'no_comment_found',
+								comments: []
+							}
+							res.status(200).send(obj);
+						}
+
+					});
+				
 				}
 				else{
 					var token=req.token;
@@ -946,21 +1024,46 @@ app.get('/user/post/comments/:pid',verifyHeader,verifyToken,function(req,res){
                    	var exitCondition = rows.length - 1
 
 					Object.keys(rows).forEach(key => {
-						var singleUser=rows[key];
+						var singleComment=rows[key];
 						if (rows[key].thumb_image != null) {
-							singleUser.thumb_image=baseURL + "/user/thumbimage/" + token + "/" + rows[key].thumb_image;
+							singleComment.thumb_image=baseURL + "/user/thumbimage/" + token + "/" + rows[key].thumb_image;
 							//console.log('post image:   ', rows[key].post_image);
 						}
-						comments.push(singleUser);
-						var obj={
-							error: false,
-							message: 'comments_found',
-							comments: comments
-						}
-						if (counter == exitCondition) {
-							res.status(200).send(obj);
-						}
-						counter++;
+
+						mysqlConnection.query('select count(lid) as post_likes_count from likes where pid=? ',[pid], async function(err, result){
+
+							if(err){
+								var post_likes_count=result[0].post_likes_count;
+								var obj={
+			
+									error: false,
+									message: 'comments_found',
+									post_likes_count: post_likes_count,
+									comments: comments
+								}
+								res.status(200).send(obj);
+							}
+							else{
+								var post_likes_count=result[0].post_likes_count;
+							
+								var obj = {
+									message: "Posts found",
+									error: false,
+									post_likes_count: post_likes_count,
+									comments: comments
+								}
+								comments.push(singleComment);
+								if (counter == exitCondition) {
+									res.status(200).send(obj);
+								}
+								counter++;
+							}
+
+						});
+						
+					
+						
+		
 					});
 				
 				
@@ -978,6 +1081,7 @@ app.get('/user/post/comments/:pid',verifyHeader,verifyToken,function(req,res){
 
 });
 
+//remove comment
 
 
 //like a post

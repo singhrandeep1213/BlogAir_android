@@ -1,22 +1,18 @@
-package com.bcabuddies.blogair.home.fragments;
+package com.bcabuddies.blogair.home;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
@@ -35,15 +31,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-public class CommentsFragment extends Fragment {
+public class CommentsActivity extends AppCompatActivity {
 
     Bundle bundle;
-    String pid, postUid, likes_count, postHeading;
+    String pid, postUid, post_likes_count, postHeading;
     RecyclerView recyclerView;
-    TextView postHeadingTv;
+    TextView postHeadingTv, likesCountTv;
     ImageView refreshIcon, postIcon;
     EditText commentDescEt;
+    ImageView backIcon;
     CommentsRecyclerAdapter commentsRecyclerAdapter;
     List<Comments.comments> finalList;
     PreferenceManager preferenceManager;
@@ -52,34 +48,31 @@ public class CommentsFragment extends Fragment {
     boolean noMoreResults = false;
     int lastSpecialRequestsCursorPosition;
     String specialRequests = "";
-    private static final String TAG = "CommentsFragment";
+    private static final String TAG = "CommentsActivity";
 
-    public CommentsFragment() {
-        // Required empty public constructor
-    }
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_comments, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_comments);
 
-        bundle = this.getArguments();
+        bundle = this.getIntent().getExtras();
         pid = bundle.getString("pid");
         postUid = bundle.getString("post_uid");
-        likes_count = bundle.getString("likes_count");
         postHeading = bundle.getString("post_heading");
-        preferenceManager = new PreferenceManager(getActivity());
+        preferenceManager = new PreferenceManager(this);
         token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
-        postHeadingTv = view.findViewById(R.id.comments_postheading);
+        postHeadingTv = findViewById(R.id.comments_postheading);
         postHeadingTv.setText(postHeading);
 
-        refreshIcon = view.findViewById(R.id.comments_refreshicon);
-        commentDescEt = view.findViewById(R.id.comments_desc);
-        postIcon= view.findViewById(R.id.comments_posticon);
+        backIcon=findViewById(R.id.comments_backicon);
+        refreshIcon = findViewById(R.id.comments_refreshicon);
+        commentDescEt = findViewById(R.id.comments_desc);
+        postIcon= findViewById(R.id.comments_posticon);
+        likesCountTv=findViewById(R.id.comments_likescount);
 
         finalList = new ArrayList<>();
         callLoadApi();
-        recyclerViewInit(view);
+        recyclerViewInit();
 
 
         //set comments input limit
@@ -123,7 +116,8 @@ public class CommentsFragment extends Fragment {
             public void onClick(View v) {
                 commentDesc= commentDescEt.getText().toString();
                 if (commentDesc.equals("")|| commentDesc.equals(null)){
-                    Toast.makeText(getActivity(), "Please write a comment", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(CommentsActivity.this , "Please write a comment", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     postIcon.setEnabled(false);
@@ -135,8 +129,16 @@ public class CommentsFragment extends Fragment {
             }
         });
 
+        //set back icon
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CommentsActivity.this.finish();
+            }
+        });
 
-        return view;
+
+
     }
 
     private void callPostApi() {
@@ -148,11 +150,11 @@ public class CommentsFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (!response.isSuccessful()){
-                    Toast.makeText(getActivity(), "Some error occured", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CommentsActivity.this, "Some error occured", Toast.LENGTH_SHORT).show();
                     postIcon.setEnabled(true);
                 }
                 else {
-                    Toast.makeText(getActivity(), "comment posted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CommentsActivity.this, "comment posted", Toast.LENGTH_SHORT).show();
                     postIcon.setEnabled(true);
 
                 }
@@ -160,17 +162,17 @@ public class CommentsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(getActivity(), "Some error occured", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CommentsActivity.this, "Some error occured", Toast.LENGTH_SHORT).show();
                 postIcon.setEnabled(true);
             }
         });
 
     }
 
-    private void recyclerViewInit(View view) {
-        commentsRecyclerAdapter = new CommentsRecyclerAdapter(getActivity(), finalList, postUid);
-        recyclerView = view.findViewById(R.id.comments_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    private void recyclerViewInit() {
+        commentsRecyclerAdapter = new CommentsRecyclerAdapter(this, finalList, postUid);
+        recyclerView = findViewById(R.id.comments_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(commentsRecyclerAdapter);
     }
 
@@ -185,12 +187,20 @@ public class CommentsFragment extends Fragment {
 
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: error:  " + response.code());
-                    Toast.makeText(getActivity(), "Some error occured", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CommentsActivity.this, "Some error occured", Toast.LENGTH_SHORT).show();
                 } else {
                     if (response.body().getComments() != null) {
                         List<Comments.comments> commentsList = response.body().getComments();
                         finalList.addAll(commentsList);
                         commentsRecyclerAdapter.notifyDataSetChanged();
+                        post_likes_count=response.body().getPost_likes_count();
+                        if (post_likes_count.equals("1")){
+                            likesCountTv.setText(" "+ post_likes_count + " person liked this.");
+                        }
+                        else{
+                            likesCountTv.setText(" "+ post_likes_count + " people liked this.");
+                        }
+
                         Log.e(TAG, "onResponse: blockedusers: " + finalList);
                     } else {
                         noMoreResults = true;
@@ -201,15 +211,10 @@ public class CommentsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Comments> call, Throwable t) {
-                Toast.makeText(getActivity(), "Check internet connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CommentsActivity.this, "Check internet connection", Toast.LENGTH_SHORT).show();
             }
         });
 
-    }
-
-    public static Fragment newInstance() {
-        CommentsFragment fragment = new CommentsFragment();
-        return fragment;
     }
 
 }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,9 +26,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.APIInterface;
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.home.fragments.CommentsFragment;
+import com.bcabuddies.blogair.home.CommentsActivity;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
+import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
@@ -190,16 +192,13 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
         holder.commentsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bundle.putString("post_uid", postUid);
+              bundle.putString("post_uid", postUid);
                 bundle.putString("pid",pid);
                 bundle.putString("likes_count", String.valueOf(likes_count));
                 bundle.putString("post_heading",postHeading);
-                Fragment fragment= CommentsFragment.newInstance();
-                fragment.setArguments(bundle);
-                AppCompatActivity activity= (AppCompatActivity) v.getContext();
-                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left,R.anim.enter_left_to_right,R.anim.exit_left_to_right);
-                ft.addToBackStack(null).replace(R.id.home_fragment, fragment).commit();
+                Intent  intent= new Intent(context,CommentsActivity.class);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
 
             }
         });

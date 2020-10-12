@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -32,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
     String thumb_image;
     ImageView homeIcon, searchIcon, addIcon, bookmarkIcon;
     CircleImageView profileIcon, profileCircle;
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getFragmentManager().popBackStack();
+        Log.e(TAG, "onBackPressed: called");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+
+
         //bottom nav click listeners
         homeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
                 fragment = HomeFeedFragment.newInstance();
                 getSupportFragmentManager().beginTransaction()
+
                         .replace(R.id.home_fragment, fragment)
                         .commit();
             }
