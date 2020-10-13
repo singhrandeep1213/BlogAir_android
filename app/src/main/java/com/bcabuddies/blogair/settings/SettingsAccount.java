@@ -5,21 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.home.AddPost;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
@@ -38,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SettingsAccount extends AppCompatActivity {

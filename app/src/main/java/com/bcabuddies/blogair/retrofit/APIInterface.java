@@ -1,4 +1,4 @@
-package com.bcabuddies.blogair;
+package com.bcabuddies.blogair.retrofit;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 

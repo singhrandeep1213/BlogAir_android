@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;

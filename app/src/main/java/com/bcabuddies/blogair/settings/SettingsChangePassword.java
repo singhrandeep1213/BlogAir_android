@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
@@ -20,7 +20,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SettingsChangePassword extends AppCompatActivity {

@@ -11,10 +11,9 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.ProfileRecyclerAdapter;
 import com.bcabuddies.blogair.model.UserProfile;
@@ -30,9 +29,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.Retrofit.Builder;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class PostUserProfile extends Fragment {

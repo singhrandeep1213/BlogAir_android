@@ -5,14 +5,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.BlockedUsersRecyclerAdapter;
 import com.bcabuddies.blogair.model.BlockedUsers;
@@ -21,13 +20,11 @@ import com.bcabuddies.blogair.utils.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SettingsBlockedUsers extends AppCompatActivity {

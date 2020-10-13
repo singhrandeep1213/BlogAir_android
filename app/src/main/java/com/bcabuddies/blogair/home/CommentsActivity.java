@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.APIInterface;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.CommentsRecyclerAdapter;
 import com.bcabuddies.blogair.model.Comments;
