@@ -41,9 +41,10 @@ public class ProfileFragment extends Fragment {
     List<UserProfile.Post> postList;
     ProfileRecyclerAdapter profileRecyclerAdapter;
     PreferenceManager preferenceManager;
-    String token, uid, thumb_image, bio;
+    String token, uid, thumb_image, bio , followersCount, followingCount;
     CircleImageView userImage;
     ImageView settingsIcon;
+    TextView followersCountTv, followingCountTv;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -67,6 +68,8 @@ public class ProfileFragment extends Fragment {
         userBioLess = view.findViewById(R.id.account_bioless);
         userImage = view.findViewById(R.id.account_userimage);
         settingsIcon=view.findViewById(R.id.account_settingicon);
+        followersCountTv=view.findViewById(R.id.account_followercount);
+        followingCountTv=view.findViewById(R.id.account_followingcount);
 
         userBio.setText(bio);
 
@@ -131,6 +134,11 @@ public class ProfileFragment extends Fragment {
                     List<UserProfile.Post> posts = response.body().getPost();
                     postList.addAll(posts);
                     profileRecyclerAdapter.notifyDataSetChanged();
+                    followersCount = response.body().getFollowers_count();
+                    followingCount=response.body().getFollowing_count();
+                    followersCountTv.setText(followersCount);
+                    followingCountTv.setText(followingCount);
+
                 }
             }
 
