@@ -883,7 +883,7 @@ app.get('/user/blocked/users',verifyHeader, verifyToken,function(req,res){
 					console.log('error while getting: ', err);
 				}
 				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
-					console.log('error here1');
+					
 					//no user found
 					var obj={
 						error: false,
@@ -894,7 +894,7 @@ app.get('/user/blocked/users',verifyHeader, verifyToken,function(req,res){
 				}
 				else{
 					var token=req.token;
-					console.log('error here2');
+					
 					var allUsers = []
                 	var counter = 0;
                    	var exitCondition = rows.length - 1
@@ -1196,6 +1196,69 @@ app.post('/user/post/bookmark', verifyHeader,verifyToken, upload.none(), async(r
 					console.log('bookmark successful');
 					res.status(200).send(obj);
 				}
+
+			});
+		}
+
+	});
+
+});
+
+//get user bookmarks
+app.get('/user/get/bookmarks/', verifyHeader,verifyToken, function(req,res){
+
+	jwt.verify(req.token,SecretKey , async function(err,authData){
+		if(err){
+			res.sendStatus(401);
+		}
+		else{
+			console.log('user verified: ');
+			var uid=authData.user.id;
+			mysqlConnection.query('select b.bid,b.created_on, p.pid, p.uid, p.post_image from bookmarks b inner join post p on b.pid = p.pid where b.uid =? and p.is_deleted=0 order by created_on desc', [uid], async function(err,rows){
+				if	(err){
+					console.log('error while getting bookmarks: ', err);
+				}
+				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
+					
+					//no bookmark found
+					var obj={
+						error: false,
+						message: 'no_bookmark_found',
+						bookmarked_posts: []
+					}
+					res.status(200).send(obj);
+				}
+				else{
+					var token = req.token;
+					var allPosts=[];
+					var counter = 0;
+					var exitCondition = rows.length - 1;
+					
+					Object.keys(rows).forEach(key => {
+
+						var singlePost= rows[key];
+						if (rows[key].post_image != null) {
+							singlePost.post_image = baseURL + "/post/image/" + token + "/" + rows[key].post_image;
+
+						}
+						allPosts.push(singlePost);
+						var obj={
+							error: false,
+							message: 'bookmakrs_found',
+							bookmarked_posts: allPosts
+						}
+						if (counter == exitCondition) {
+							res.status(200).send(obj);
+						}
+						counter++;
+
+					});
+
+				
+
+				}
+
+
 
 			});
 		}

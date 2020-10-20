@@ -15,6 +15,7 @@ import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.BlockedUsersRecyclerAdapter;
 import com.bcabuddies.blogair.model.BlockedUsers;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
@@ -73,9 +74,9 @@ public class SettingsBlockedUsers extends AppCompatActivity {
     }
 
     private void callApi() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
-        APIInterface blockedUsersApi = retrofit.create(APIInterface.class);
+
+        APIInterface blockedUsersApi = RetrofitManager.getRetrofit().create(APIInterface.class);
         Call<BlockedUsers> blockedUsersCall = blockedUsersApi.getBlockedUsers("bearer " + token);
 
         blockedUsersCall.enqueue(new Callback<BlockedUsers>() {

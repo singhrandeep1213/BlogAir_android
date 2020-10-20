@@ -4,6 +4,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bcabuddies.blogair.model.BlockedUsers;
 
+import com.bcabuddies.blogair.model.Bookmarks;
 import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
@@ -121,10 +122,15 @@ public interface APIInterface {
     Call<ResponseBody> addComment(@Header("authorization") String token, @Field("cid") String cid , @Field("pid") String pid, @Field("comment_description") String commentDesc);
 
     //remove a post
-    //get comments of a post
     @Headers(Constants.KEY_HEADER)
     @GET(("/user/post/removepost/{pid}"))
     Call<ResponseBody> removePost(@Header("authorization") String token, @Path("pid") String pid );
+
+    //user bookmarked posts
+    @Headers(Constants.KEY_HEADER)
+    @GET("/user/get/bookmarks/")
+    Call<Bookmarks> getBookmarkedPosts(@Header("authorization") String token );
+
 
 /*
     //test jwt auth token
