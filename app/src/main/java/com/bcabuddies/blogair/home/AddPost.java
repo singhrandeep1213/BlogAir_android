@@ -4,21 +4,26 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.fragments.HomeFeedFragment;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -33,23 +38,23 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-
 public class AddPost extends AppCompatActivity {
 
     Uri postImageUri = null;
     ImageView postImageView, secondaryImageView, backIcon;
     ConstraintLayout primaryLayout, secondaryLayout;
     private static final String TAG = "AddPost";
-    TextInputLayout headingTextLayout, descTextLayout;
+    TextInputEditText headingTextEt, descTextEt;
     Button addPostButton;
     private Bitmap post_Bitmap = null;
     private byte[] thumb_byte;
     PreferenceManager preferenceManager;
     String token, pid;
-    File thumb_filePathUri=null;
+    File thumb_filePathUri = null;
+    int lastSpecialRequestsCursorPosition;
+    String specialRequests = "";
 
-
-    String postHeading="", postDescription="";
+    String postHeading = "", postDescription = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +67,10 @@ public class AddPost extends AppCompatActivity {
         secondaryImageView = findViewById(R.id.addpost_secondaryimage);
         primaryLayout = findViewById(R.id.addpost_primarylayout);
         secondaryLayout = findViewById(R.id.addpost_secondarylayout);
-        headingTextLayout = findViewById(R.id.addpost_headlayout);
-        descTextLayout = findViewById(R.id.addpost_captionlayout);
+        headingTextEt = findViewById(R.id.addpost_headingtv);
+        descTextEt = findViewById(R.id.addpost_desctv);
         addPostButton = findViewById(R.id.addpost_addbtn);
-        backIcon=findViewById(R.id.addpost_backicon);
+        backIcon = findViewById(R.id.addpost_backicon);
 
         imagePicker();
 
@@ -93,21 +98,49 @@ public class AddPost extends AppCompatActivity {
         addPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                postHeading=headingTextLayout.getEditText().getText().toString().trim();
-                postDescription=descTextLayout.getEditText().getText().toString().trim();
+                postHeading = headingTextEt.getText().toString();
+                postDescription = descTextEt.getText().toString();
                 pid = UUID.randomUUID().toString();
                 callApi();
             }
         });
 
+        //limit post desc input lines
+        descTextEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                lastSpecialRequestsCursorPosition = descTextEt.getSelectionStart();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                descTextEt.removeTextChangedListener(this);
+
+                if (descTextEt.getLineCount() > 8) {
+                    descTextEt.setText(specialRequests);
+                    descTextEt.setSelection(lastSpecialRequestsCursorPosition);
+                } else
+                    specialRequests = descTextEt.getText().toString();
+
+                descTextEt.addTextChangedListener(this);
+            }
+        });
+
+
     }
+
 
     private void callApi() {
 
         RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("multipart/form-data"), thumb_filePathUri);
-        RequestBody pid= RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.pid);
-        RequestBody postDescription =RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postDescription);
-        RequestBody postHeading =RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postHeading);
+        RequestBody pid = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.pid);
+        RequestBody postDescription = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postDescription);
+        RequestBody postHeading = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postHeading);
 
         MultipartBody.Part mBody =
                 MultipartBody.Part.createFormData("post_image", thumb_filePathUri.getName(), requestFile);
@@ -123,16 +156,24 @@ public class AddPost extends AppCompatActivity {
                 if (!response.isSuccessful()){
                     Log.e(TAG, "onResponse: addpost error: "+response.code() );
                 }
-                else{
-                    Log.e(TAG, "onResponse: addpost: "+response.body() );
+                else {
+                    Toast.makeText(AddPost.this, "Uploaded successfully", Toast.LENGTH_SHORT).show();
+
+                    Intent i=new Intent(AddPost.this,MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                    AddPost.this.finish();
+                    Log.e(TAG, "onResponse: addpost: " + response.body());
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e(TAG, "onFailure: addpost: "+t.getMessage().toString() );
+                Log.e(TAG, "onFailure: addpost: " + t.getMessage().toString());
             }
         });
+
+
 
     }
 

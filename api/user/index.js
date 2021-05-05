@@ -477,7 +477,7 @@ app.get('/user/current/profile/:uid',verifyHeader,verifyToken,(req,res)=>{
 		const auth_uid= authData.user.id;
 		var uid=req.params.uid; 
 		if(auth_uid==uid){
-			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? order by time_stamp desc',[uid],(err,rows,fields)=>{
+			mysqlConnection.query('SELECT pid,post_image FROM post where uid= ? and is_deleted = 0 order by time_stamp desc',[uid],(err,rows,fields)=>{
 				if(!err){
 					var post=[];
 					var following_count;

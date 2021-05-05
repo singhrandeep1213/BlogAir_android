@@ -55,7 +55,8 @@ public class HomeFeedFragment extends Fragment  {
     @Override
     public void onResume() {
         super.onResume();
-     
+        Log.e(TAG, "onResume: homefeedcalled" );
+
 
     }
 
