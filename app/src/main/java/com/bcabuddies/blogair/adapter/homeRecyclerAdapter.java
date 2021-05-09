@@ -188,10 +188,11 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
             }
         });
 
+        //open comments activity
         holder.commentsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              bundle.putString("post_uid", postUid);
+                bundle.putString("post_uid", postUid);
                 bundle.putString("pid",pid);
                 bundle.putString("likes_count", String.valueOf(likes_count));
                 bundle.putString("post_heading",postHeading);
@@ -347,7 +348,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
                 popupMenu.setForceShowIcon(true);
                 MenuInflater inflater = popupMenu.getMenuInflater();
                 if (postUid.equals(currentUid)) {
-                    Log.e(TAG, "onClick: dots if");
+                    Log.e(TAG,  "onClick: dots if");
                     inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
                 } else {
                     Log.e(TAG, "onClick: dots else");

@@ -2,12 +2,14 @@ package com.bcabuddies.blogair.retrofit;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.bcabuddies.blogair.home.SinglePost;
 import com.bcabuddies.blogair.model.BlockedUsers;
 
 import com.bcabuddies.blogair.model.Bookmarks;
 import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
+import com.bcabuddies.blogair.model.SinglePostData;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
 import com.bcabuddies.blogair.model.UserProfile;
 import com.bcabuddies.blogair.utils.Constants;
@@ -131,7 +133,10 @@ public interface APIInterface {
     @GET("/user/get/bookmarks/")
     Call<Bookmarks> getBookmarkedPosts(@Header("authorization") String token );
 
-
+    //get single post data (i.e. heading and description only)
+    @Headers(Constants.KEY_HEADER)
+    @GET(("/user/post/singlepostdata/{pid}"))
+    Call<SinglePostData> getSinglePostData(@Header("authorization") String token, @Path("pid") String pid);
 /*
     //test jwt auth token
     @Headers("key: Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9RahulGaurqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvRGjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcL22")

@@ -15,7 +15,18 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".home.CommentsActivity"></activity>
+        <activity android:name=".home.SinglePost"></activity>
+
+
+        <!--
+               Set to true if your app is Standalone, that is, it does not require the handheld
+               app to run.
+        -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
+
+        <activity android:name=".home.CommentsActivity" />
         <activity android:name=".settings.SettingsBlockedUsers" />
         <activity android:name=".settings.SettingsChangePassword" />
         <activity android:name=".settings.SettingsAccount" />

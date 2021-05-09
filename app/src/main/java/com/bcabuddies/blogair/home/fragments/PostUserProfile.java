@@ -94,7 +94,7 @@ public class PostUserProfile extends Fragment {
 
     private void recyclerviewInit(View view) {
 
-        profileRecyclerAdapter= new ProfileRecyclerAdapter(getActivity(),finallist);
+        profileRecyclerAdapter= new ProfileRecyclerAdapter(getActivity(),finallist,fullName,thumbImage);
         postRecyclerview= view.findViewById(R.id.userprof_recyclerview);
         postRecyclerview.setLayoutManager(new GridLayoutManager(getActivity(), 3, GridLayoutManager.VERTICAL, false));
         postRecyclerview.setAdapter(profileRecyclerAdapter);

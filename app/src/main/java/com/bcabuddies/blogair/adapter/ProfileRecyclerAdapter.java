@@ -1,6 +1,9 @@
 package com.bcabuddies.blogair.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.SinglePost;
 import com.bcabuddies.blogair.model.UserProfile;
 import com.bumptech.glide.Glide;
 
@@ -19,10 +23,21 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileRecycler
 
     private Context context;
     private List<UserProfile.Post> userPostList;
+    private static final String TAG = "ProfileRecyclerAdapter";
+    String userFullName, userThumbImage;
+    String pid;
+    Bundle bundle;
 
-    public ProfileRecyclerAdapter(Context context, List<UserProfile.Post> userPostList) {
+ /*   public ProfileRecyclerAdapter(Context context, List<UserProfile.Post> userPostList) {
         this.context = context;
         this.userPostList = userPostList;
+    }
+*/
+    public ProfileRecyclerAdapter(Context context, List<UserProfile.Post> userPostList, String userFullName, String userThumbImage) {
+        this.context = context;
+        this.userPostList = userPostList;
+        this.userFullName = userFullName;
+        this.userThumbImage = userThumbImage;
     }
 
     @NonNull
@@ -36,6 +51,24 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileRecycler
     public void onBindViewHolder(@NonNull profileViewHolder holder, int position) {
         String postImageUrl= userPostList.get(position).getPost_image();
         Glide.with(context).load(postImageUrl).into(holder.profilePostImage);
+
+        holder.profilePostImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pid= userPostList.get(position).getPid();
+                bundle=new Bundle();
+                Log.e(TAG, "profilerecycler: userthumb: "+userThumbImage + "\n user fullname: "+userFullName );
+                Log.e(TAG, "profilerecycler: "+ userPostList.get(position).getPost_image() + "  Pid: "+ userPostList.get(position).getPid() );
+                bundle.putString("thumb_image",userThumbImage);
+                bundle.putString("full_name", userFullName);
+                bundle.putString("post_image_url",postImageUrl);
+                bundle.putString("pid",pid);
+                Intent intent = new Intent(context, SinglePost.class);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     @Override

@@ -137,16 +137,12 @@ app.post('/user/login',upload.none(),verifyHeader, async (req,res)=>{
 										uid: rows[0].uid,
 										bio: rows[0].bio
 									};
-	
-	
 									console.log("----------------------");
 									console.log(obj);
 									console.log("----------------------");
 									res.status(200).json(obj);
 								}
-	
 							})
-	
 						}
 						else{
 							var obj = {
@@ -678,6 +674,93 @@ app.get('/user/homeFeed/:page_no',verifyHeader, verifyToken,(req,res)=>{
 	})
 });
 
+//get single post data
+app.get('/user/post/singlepostdata/:pid', verifyHeader,verifyToken,upload.none(), (req,res)=>{
+
+	jwt.verify(req.token, SecretKey, (err,authData)=>{
+		if(err){
+			console.log('user not verified');
+			res.status(401);
+		}
+		else{
+			var pid=req.params.pid;
+			var uid = authData.user.id;
+			console.log('singlepost pid: ', pid);
+			mysqlConnection.query('select `pid`, `uid` , `desc` , `post_heading`, `time_stamp` from post where pid = ?	', [pid], (err,rows)=>{
+				if(err){
+					console.log('error in query');
+					res.status(404);
+				}
+				else{
+
+								
+				if(!rows || rows == null || rows === null || rows[0] === null || !rows[0]){
+					//user dont have any post
+					console.log('no post found');
+					var obj={
+						error: false,
+						message: 'No post found with this pid',
+						post_data: []
+					}
+					res.status(200).send(obj);
+				}
+				else{
+					//check if its bookmarked by current user
+					mysqlConnection.query('select count(bid) as is_bookmarked from bookmarks where uid = ? and pid = ?',[uid,pid],function(err,result){
+
+						if(err){
+							//error in query
+							console.log('error in getting single post bookemark status');
+							var obj = {
+								message: "Posts found",
+								error: false,
+								post_data: []
+							}
+							res.status(200).send(obj);
+
+						}
+						else{
+							var is_bookmarked = result[0].is_bookmarked;
+							
+							//get likes count and is_liked_by_user
+							mysqlConnection.query('select count(lid) as likes_count, (select count(uid)  from likes where uid=? and pid=?) as is_liked_by_current_user from likes where pid=?',[uid,pid,pid], function(err, result){
+								if(err){
+									var obj = {
+										message: "Posts found",
+										error: false,
+										post_data: []
+									}
+
+									res.status(200).send(obj)
+								}
+								else{
+									console.log('uid: ',uid);
+									var likes_count=result[0].likes_count;
+									var is_liked_by_current_user= result[0].is_liked_by_current_user;
+									console.log('is_liked_by_current_user:  ',is_liked_by_current_user );
+									
+									var obj = {
+										message: "Posts found",
+										error: false,
+										is_bookmarked: is_bookmarked,
+										is_liked_by_current_user: is_liked_by_current_user,
+										likes_count: likes_count,
+										post_data: [rows[0]]
+										
+									}
+									res.status(200).send(obj);
+								}
+							});
+						}
+					});					
+				}
+				}
+			});
+		}
+	});
+
+
+})
 
 //get user profile (not current) pass uid
 app.get('/user/post/profile/:puid',verifyHeader,verifyToken,upload.none(), (req,res)=>{
@@ -915,18 +998,11 @@ app.get('/user/blocked/users',verifyHeader, verifyToken,function(req,res){
 							res.status(200).send(obj);
 						}
 						counter++;
-					});
-					
+					});	
 				}
-
 			});
 		}
-
-
 	});
-
-
-
 });
 
 //add commnet on a post
@@ -960,14 +1036,8 @@ app.post('/user/post/addcomment/', verifyHeader, verifyToken,upload.none(), asyn
 					res.status(200).send(obj);
 				}
 			});
-
-
-
 		}
-
 	});
-
-
 });
 
 //get comments of a post
@@ -1059,22 +1129,10 @@ app.get('/user/post/comments/:pid',verifyHeader,verifyToken,function(req,res){
 								counter++;
 							}
 
-						});
-						
-					
-						
-		
-					});
-				
-				
+						});		
+					});				
 				}
-
-
-
-			});
-		
-
-		
+			});		
 		}
 
 	});
@@ -1160,9 +1218,7 @@ app.post('/user/post/unlike', verifyHeader,verifyToken, upload.none(), async(req
 			} )
 
 		}
-
 	});
-
 });
 
 //bookmark a post
@@ -1201,7 +1257,6 @@ app.post('/user/post/bookmark', verifyHeader,verifyToken, upload.none(), async(r
 		}
 
 	});
-
 });
 
 //get user bookmarks
@@ -1456,12 +1511,9 @@ async function uploadPost(pid,post_desc,post_image_url,uid,post_heading){
 					error: true,
 					message: "Error: " + err
 				}
-				reject(obj);
-			
+				reject(obj);			
 			}
-
 		});
-
 	});
 
 }
@@ -1554,6 +1606,8 @@ async function deleteOldProfile(_fileName) {
     });
 }
 
+
+
 //get user profile (not current) 
 async function getUserProfile(passed_user_id, message,type,token){
 	
@@ -1644,16 +1698,9 @@ async function getUserProfile(passed_user_id, message,type,token){
 		}
 		resolve(obj);
 			}
-
 		});
-
-
-			
 			}
-		});
-
-
-		
+		});		
 	});
 
 

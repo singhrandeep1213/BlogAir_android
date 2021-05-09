@@ -41,7 +41,7 @@ public class ProfileFragment extends Fragment {
     List<UserProfile.Post> postList;
     ProfileRecyclerAdapter profileRecyclerAdapter;
     PreferenceManager preferenceManager;
-    String token, uid, thumb_image, bio , followersCount, followingCount;
+    String token, uid, thumb_image, bio , followersCount, followingCount, fullName;
     CircleImageView userImage;
     ImageView settingsIcon;
     TextView followersCountTv, followingCountTv;
@@ -61,6 +61,7 @@ public class ProfileFragment extends Fragment {
         token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         uid = preferenceManager.getString(Constants.KEY_UID);
         thumb_image = preferenceManager.getString(Constants.KEY_THUMB_IMAGE);
+        fullName=preferenceManager.getString(Constants.KEY_FUll_NAME);
         bio=preferenceManager.getString(Constants.KEY_USER_BIO);
 
         userBio = view.findViewById(R.id.account_biotv);
@@ -129,7 +130,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: prpfile error:  " + response.code());
+                    Log.e(TAG, "onResponse: profile error:  " + response.code());
                 } else {
                     List<UserProfile.Post> posts = response.body().getPost();
                     postList.addAll(posts);
@@ -156,7 +157,7 @@ public class ProfileFragment extends Fragment {
 
     private void recyclerViewInit(View view) {
 
-        profileRecyclerAdapter = new ProfileRecyclerAdapter(getActivity(), postList);
+        profileRecyclerAdapter = new ProfileRecyclerAdapter(getActivity(), postList, fullName,thumb_image);
         postRecyclerView = view.findViewById(R.id.account_recyclerview);
         postRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3, GridLayoutManager.VERTICAL, false));
         postRecyclerView.setAdapter(profileRecyclerAdapter);

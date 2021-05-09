@@ -1,7 +1,7 @@
 {
   "name": "nodejstut",
   "version": "1.0.0",
-  "description": "",
+  "description": "commands to be exectued for npm:\r \t-> npm init -yes\r \t-> npm install --save mysql\r \t-> npm install --save express\r \t-> npm install --save body-parser\r \t-> npm install -g nodemon",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,8 +15,10 @@
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
     "multiparty": "^4.2.2",
-    "mysql": "^2.17.1",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.6",
     "uuid": "^8.3.0"
-  }
+  },
+  "devDependencies": {},
+  "keywords": []
 }
