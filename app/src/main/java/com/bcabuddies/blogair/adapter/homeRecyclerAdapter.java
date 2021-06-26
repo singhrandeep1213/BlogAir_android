@@ -424,7 +424,7 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
             }
         });
 

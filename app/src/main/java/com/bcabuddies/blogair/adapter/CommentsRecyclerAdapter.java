@@ -1,15 +1,19 @@
 package com.bcabuddies.blogair.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +25,8 @@ import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
 import com.bcabuddies.blogair.model.Comments;
+import com.bcabuddies.blogair.retrofit.APIInterface;
+import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bumptech.glide.Glide;
@@ -28,6 +34,10 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecyclerAdapter.commentsViewHolder> {
 
@@ -109,7 +119,7 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
             public void onClick(View v) {
                 Log.e(TAG, "onClick: dots clicked");
                 final PopupMenu popupMenu = new PopupMenu(context, v);
-                popupMenu.setForceShowIcon(true);
+               // popupMenu.setForceShowIcon(true);
                 MenuInflater inflater = popupMenu.getMenuInflater();
                 if (commentUid.equals(currentUid)) {
                     Log.e(TAG, "onClick: dots if");
@@ -119,7 +129,61 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
                     inflater.inflate(R.menu.report_menu, popupMenu.getMenu());
                 }
 
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.delete_menu_btn:
+                                final AlertDialog alertDialog;
+                                alertDialog = new AlertDialog.Builder(context)
+                                        .setMessage("Delete this comment?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Log.e(TAG, "onClick: cid: " + cid);
+                                                callRemoveCommentApi(token, cid,position);
+                                               // Toast.makeText(context, "Yes clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Toast.makeText(context, "No clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .show();
+                        }
+
+                        return false;
+                    }
+                });
+
                 popupMenu.show();
+            }
+        });
+
+    }
+
+    private void callRemoveCommentApi(String token, String cid, int position) {
+        Log.e(TAG, "callRemovePostApi: cid: " + cid);
+        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+        Call<ResponseBody> removeComment = jsonHomeFeedApi.removeComment("bearer " + token, cid);
+
+        removeComment.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Comment Deleted Successfully", Toast.LENGTH_SHORT).show();
+                    commentsList.remove(position);
+                    notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(context, "Some error occured", Toast.LENGTH_SHORT).show();
             }
         });
 

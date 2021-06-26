@@ -9,6 +9,7 @@ import com.bcabuddies.blogair.model.Bookmarks;
 import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
+import com.bcabuddies.blogair.model.SearchUser;
 import com.bcabuddies.blogair.model.SinglePostData;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
 import com.bcabuddies.blogair.model.UserProfile;
@@ -23,6 +24,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HEAD;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
@@ -123,6 +125,12 @@ public interface APIInterface {
     @FormUrlEncoded
     Call<ResponseBody> addComment(@Header("authorization") String token, @Field("cid") String cid , @Field("pid") String pid, @Field("comment_description") String commentDesc);
 
+    //remove a comment
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/post/comments/remove")
+    @FormUrlEncoded
+    Call<ResponseBody> removeComment(@Header("authorization") String token, @Field("cid") String cid);
+
     //remove a post
     @Headers(Constants.KEY_HEADER)
     @GET(("/user/post/removepost/{pid}"))
@@ -137,6 +145,11 @@ public interface APIInterface {
     @Headers(Constants.KEY_HEADER)
     @GET(("/user/post/singlepostdata/{pid}"))
     Call<SinglePostData> getSinglePostData(@Header("authorization") String token, @Path("pid") String pid);
+
+    //Search users
+    @Headers(Constants.KEY_HEADER)
+    @GET("/user/search/{name}")
+    Call<SearchUser> searchUser(@Header("authorization") String token, @Path("name") String name);
 /*
     //test jwt auth token
     @Headers("key: Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9RahulGaurqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvRGjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcL22")
