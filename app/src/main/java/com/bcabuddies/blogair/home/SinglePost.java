@@ -1,14 +1,19 @@
 package com.bcabuddies.blogair.home;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,33 +28,29 @@ import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class SinglePost extends AppCompatActivity {
 
     CircleImageView userThumbImageView;
     TextView postHeadingTv, fullNameTv, timeStampTv, postDescTv;
-    TextView moreTv,lessTv;
+    TextView moreTv, lessTv;
     ImageView postImageView, commentsImageView, likeSelectedImageView, likeUnSelectedImageView, dotsMenuImageView, bookmarkSelectedImageView, bookmarkUnSelectedImageView;
-    String fullName,thumbImage, postImageUrl, pid;
+    String fullName, thumbImage, postImageUrl, pid;
     String token;
-    String postUid;
+    String postUid, uid;
     Date timeStamp;
-    String postHeading="", postDescription="";
-    int likesCount=0;
+    String postHeading = "", postDescription = "";
+    int likesCount = 0;
     Bundle bundle;
     PreferenceManager preferenceManager;
     private static final String TAG = "SinglePost";
-
-
 
 
     @Override
@@ -58,29 +59,28 @@ public class SinglePost extends AppCompatActivity {
         setContentView(R.layout.activity_single_post);
 
         bundle = this.getIntent().getExtras();
-        fullName=bundle.getString("full_name");
-        thumbImage= bundle.getString("thumb_image");
-        postImageUrl=bundle.getString("post_image_url");
-        pid= bundle.getString("pid");
+        fullName = bundle.getString("full_name");
+        thumbImage = bundle.getString("thumb_image");
+        postImageUrl = bundle.getString("post_image_url");
+        pid = bundle.getString("pid");
 
-        preferenceManager=new PreferenceManager(this);
-        token=preferenceManager.getString(Constants.KEY_JWT_TOKEN);
-
+        preferenceManager = new PreferenceManager(this);
+        token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
+        uid = preferenceManager.getString(Constants.KEY_UID);
         userThumbImageView = findViewById(R.id.singlepost_thumbimage);
         postHeadingTv = findViewById(R.id.singlepost_postheading);
         fullNameTv = findViewById(R.id.singlepost_fullname);
         timeStampTv = findViewById(R.id.singlepost_timestamp);
-        postDescTv=findViewById(R.id.singlepost_postdesc);
-        moreTv=findViewById(R.id.singlepost_moretv);
-        lessTv=findViewById(R.id.singlepost_lesstv);
+        postDescTv = findViewById(R.id.singlepost_postdesc);
+        moreTv = findViewById(R.id.singlepost_moretv);
+        lessTv = findViewById(R.id.singlepost_lesstv);
         postImageView = findViewById(R.id.singlepost_postimage);
         commentsImageView = findViewById(R.id.singlepost_comments_icon);
         likeSelectedImageView = findViewById(R.id.singlepost_likeselesctedicon);
         likeUnSelectedImageView = findViewById(R.id.singlepost_likeunselesctedicon);
         dotsMenuImageView = findViewById(R.id.singlepost_dotsmenu);
-        bookmarkSelectedImageView=findViewById(R.id.singlepost_bookmarkselected);
-        bookmarkUnSelectedImageView=findViewById(R.id.singlepost_bookmarkunselected);
-
+        bookmarkSelectedImageView = findViewById(R.id.singlepost_bookmarkselected);
+        bookmarkUnSelectedImageView = findViewById(R.id.singlepost_bookmarkunselected);
 
 
         fullNameTv.setText(fullName);
@@ -89,6 +89,57 @@ public class SinglePost extends AppCompatActivity {
 
         callLoadApi();
 
+        dotsMenuImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context;
+                View anchor;
+                final PopupMenu popupMenu = new PopupMenu(SinglePost.this, v);
+                //popupMenu.setForceShowIcon(true);
+                MenuInflater inflater = popupMenu.getMenuInflater();
+                if (postUid.equals(uid)) {
+                    Log.e(TAG, "onClick: dots if");
+                    inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
+                } else {
+                    Log.e(TAG, "onClick: dots else");
+                    inflater.inflate(R.menu.report_menu, popupMenu.getMenu());
+                }
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete_menu_btn:
+                                final AlertDialog alertDialog;
+                                alertDialog = new AlertDialog.Builder(SinglePost.this)
+                                        .setMessage("Delete this post?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Log.e(TAG, "onClick: pid: " + pid);
+                                                callRemovePostApi();
+                                                Toast.makeText(SinglePost.this, "Yes clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Toast.makeText(SinglePost.this, "No clicked", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .show();
+                                Toast.makeText(SinglePost.this, "delete clicked", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.report_menu_btn:
+                                Toast.makeText(SinglePost.this, "Report clicked", Toast.LENGTH_SHORT).show();
+                                break;
+
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
 
         likeSelectedImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,22 +188,44 @@ public class SinglePost extends AppCompatActivity {
                 bundle.putString("post_uid",postUid);
                 bundle.putString("pid",pid);
                 bundle.putString("likes_count", String.valueOf(likesCount));
-                bundle.putString("post_heading",postHeading);
-                Intent intent=new Intent(SinglePost.this,CommentsActivity.class);
+                bundle.putString("post_heading", postHeading);
+                Intent intent = new Intent(SinglePost.this, CommentsActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
 
 
+    }
 
+    private void callRemovePostApi() {
+        Log.e(TAG, "callRemovePostApi: pid: " + pid);
+        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
+        Call<ResponseBody> removePost = jsonHomeFeedApi.removePost("bearer " + token, pid);
+
+        removePost.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(SinglePost.this, "Some error occured", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(SinglePost.this, "Post Deleted", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 
     private void callAddBookmarkApi() {
-        String bid= UUID.randomUUID().toString();
-        APIInterface postLikeApi= RetrofitManager.getRetrofit().create(APIInterface.class);
-        Call<ResponseBody> likeCall =postLikeApi.bookmarkPost("bearer " + token,bid,pid);
+        String bid = UUID.randomUUID().toString();
+        APIInterface postLikeApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+        Call<ResponseBody> likeCall = postLikeApi.bookmarkPost("bearer " + token, bid, pid);
 
         likeCall.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -358,13 +431,5 @@ public class SinglePost extends AppCompatActivity {
             bookmarkUnSelectedImageView.setVisibility(View.VISIBLE);
             bookmarkSelectedImageView.setVisibility(View.GONE);
         }
-
-
-
-
-
-        Log.e(TAG, "setViews: liked: "+isLikedByCurrentUser );
-
-
     }
 }
