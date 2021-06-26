@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:hint="Your interesting title "
-                android:inputType="text"
+                android:inputType="textCapSentences"
                 android:maxLength="60"
                 android:padding="5dp" />
         </com.google.android.material.textfield.TextInputLayout>

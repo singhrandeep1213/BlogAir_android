@@ -15,10 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.home.fragments.HomeFeedFragment;
 import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
@@ -28,8 +26,10 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
+import id.zelory.compressor.Compressor;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -47,13 +47,11 @@ public class AddPost extends AppCompatActivity {
     TextInputEditText headingTextEt, descTextEt;
     Button addPostButton;
     private Bitmap post_Bitmap = null;
-    private byte[] thumb_byte;
     PreferenceManager preferenceManager;
     String token, pid;
-    File thumb_filePathUri = null;
+    File thumb_filePathUri = null, compressedPostImageFile = null;
     int lastSpecialRequestsCursorPosition;
     String specialRequests = "";
-
     String postHeading = "", postDescription = "";
 
     @Override
@@ -130,21 +128,17 @@ public class AddPost extends AppCompatActivity {
                 descTextEt.addTextChangedListener(this);
             }
         });
-
-
     }
-
 
     private void callApi() {
 
-        RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("multipart/form-data"), thumb_filePathUri);
+        RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("multipart/form-data"), compressedPostImageFile);
         RequestBody pid = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.pid);
         RequestBody postDescription = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postDescription);
         RequestBody postHeading = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.postHeading);
 
         MultipartBody.Part mBody =
-                MultipartBody.Part.createFormData("post_image", thumb_filePathUri.getName(), requestFile);
-
+                MultipartBody.Part.createFormData("post_image", compressedPostImageFile.getName(), requestFile);
 
         APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
@@ -158,7 +152,6 @@ public class AddPost extends AppCompatActivity {
                 }
                 else {
                     Toast.makeText(AddPost.this, "Uploaded successfully", Toast.LENGTH_SHORT).show();
-
                     Intent i=new Intent(AddPost.this,MainActivity.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
@@ -172,8 +165,6 @@ public class AddPost extends AppCompatActivity {
                 Log.e(TAG, "onFailure: addpost: " + t.getMessage().toString());
             }
         });
-
-
 
     }
 
@@ -197,28 +188,23 @@ public class AddPost extends AppCompatActivity {
             Log.e(TAG, "onActivityResult: code:: " + requestCode);
             if (requestCode == 203) {
                 Log.e(TAG, "onActivityResult: " + postImageUri);
-                try{
+                try {
                     postImageUri = result.getUri();
                     postImageView.setImageURI(postImageUri);
                     secondaryImageView.setImageURI(postImageUri);
                     thumb_filePathUri = new File(postImageUri.getPath());
-                    Log.e(TAG, "onActivityResult: thumb_filepath: "+thumb_filePathUri );
+
+                    try {
+                        compressedPostImageFile = new Compressor(this).setMaxWidth(640).setMaxHeight(480).setQuality(50).compressToFile(thumb_filePathUri);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.e(TAG, "onActivityResult: thumb_filepath: " + thumb_filePathUri);
                 }catch (Exception e){
                     AddPost.this.finish();
                     Log.e(TAG, "onActivityResult: exception:" );
                 }
-
-               /* try {
-                    post_Bitmap = new Compressor(this).setMaxWidth(640).setMaxHeight(480).setQuality(50).compressToBitmap(thumb_filePathUri);
-                    Log.e(TAG, "onActivityResult: successfully compressed:  "+post_Bitmap );
-                } catch (IOException e) {
-                    Log.e(TAG, "onActivityResult: error in compressing" );
-                    e.printStackTrace();
-                }
-              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                post_Bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-                thumb_byte = byteArrayOutputStream.toByteArray();
-                Log.e(TAG, "onActivityResult: thumb_byte "+thumb_byte.toString());*/
             } else {
                 Log.e(TAG, "onActivityResult: crop failed error:  " + result.getError());
             }
