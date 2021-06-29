@@ -24,10 +24,14 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class SearchFragment extends Fragment {
@@ -59,32 +63,50 @@ public class SearchFragment extends Fragment {
         searchList = new ArrayList<>();
         searchText = view.findViewById(R.id.search_textet);
 
+
+
         recyclerViewInit(view);
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                //searchList.clear();
+                if (s.toString() == "" || s.toString().equals("") ||s.toString() ==null || s.length() ==0 ){
+                    Log.e(TAG, "onTextChanged: here: 5: "+ s.toString() );
+                    searchList.clear();
+                    searchRecyclerAdapter.notifyDataSetChanged();
+                }
+
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+                if (count > 0) {
+                    //    Log.e(TAG, "onTextChanged: here: 2" );
+                    String name = s.toString();
+                    //searchList.clear();
+                    callSearchApi(name, token);
 
-               if (count > 0) {
 
-                String name = s.toString();
-                //searchList.clear();
-                callSearchApi(name, token);
-                }
-               if (s.equals("") || s.equals(null) || s == null){
-                   searchList.clear();
                }
+            else if (count==0){
+                    Log.e(TAG, "onTextChanged: here: 3: "+s.toString() );
+                    searchList.clear();
+                    searchRecyclerAdapter.notifyDataSetChanged();
+
+               }
+
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (s.toString() == "" || s.toString().equals("") ||s.toString() ==null || s.length() ==0 ){
+                    Log.e(TAG, "onTextChanged: here: 4: "+ s.toString() );
+                    searchList.clear();
+                    searchRecyclerAdapter.notifyDataSetChanged();
+                }
+              //  Log.e(TAG, "onTextChanged: here: 4: "+ s.toString() );
             }
         });
 
@@ -100,7 +122,16 @@ public class SearchFragment extends Fragment {
     }
 
     private void callSearchApi(String name, String token) {
-        APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(50, TimeUnit.SECONDS)
+                .readTimeout(50,TimeUnit.SECONDS).build();
+
+       Retrofit retrofit= new Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(client).build();
+
+        APIInterface jsonHomeFeedApi = retrofit.create(APIInterface.class);
+        //APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
         Call<SearchUser> listCall = jsonHomeFeedApi.searchUser("bearer " + token, name);
         listCall.enqueue(new Callback<SearchUser>() {
@@ -110,9 +141,9 @@ public class SearchFragment extends Fragment {
                     Log.e(TAG, "onResponse: error:  " + response.code());
                     Toast.makeText(getActivity(), "Some error occured1", Toast.LENGTH_SHORT).show();
                 } else {
-                    searchList.clear();
                     Log.e(TAG, "onResponse: searchname: " + response.body().getUsers().get(0).getFull_name());
                     List<SearchUser.User> users = response.body().getUsers();
+                    searchList.clear();
                     searchList.addAll(users);
                     searchRecyclerAdapter.notifyDataSetChanged();
                     Log.e(TAG, "onResponse: searchusers: " + searchList);
@@ -123,6 +154,8 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onFailure(Call<SearchUser> call, Throwable t) {
+                searchList.clear();
+                searchRecyclerAdapter.notifyDataSetChanged();
                 Log.e(TAG, "onFailure: searchuser: " + t.toString());
                 Toast.makeText(getActivity(), "Some error occured2", Toast.LENGTH_SHORT).show();
             }

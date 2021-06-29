@@ -27,6 +27,8 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import id.zelory.compressor.Compressor;
@@ -98,8 +100,11 @@ public class AddPost extends AppCompatActivity {
             public void onClick(View view) {
                 postHeading = headingTextEt.getText().toString();
                 postDescription = descTextEt.getText().toString();
+                SimpleDateFormat s= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String timeStamp = s.format(new Date());
+                Log.e(TAG, "onClick: datetime: "+timeStamp );
                 pid = UUID.randomUUID().toString();
-                callApi();
+                callApi(timeStamp);
             }
         });
 
@@ -130,7 +135,7 @@ public class AddPost extends AppCompatActivity {
         });
     }
 
-    private void callApi() {
+    private void callApi(String timeStamp) {
 
         RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("multipart/form-data"), compressedPostImageFile);
         RequestBody pid = RequestBody.create(okhttp3.MediaType.parse("text/plain"), this.pid);
@@ -142,7 +147,7 @@ public class AddPost extends AppCompatActivity {
 
         APIInterface jsonHomeFeedApi = RetrofitManager.getRetrofit().create(APIInterface.class);
 
-        Call<ResponseBody> listCall = jsonHomeFeedApi.addNewPost("bearer " + token,pid,postDescription,mBody,postHeading );
+        Call<ResponseBody> listCall = jsonHomeFeedApi.addNewPost("bearer " + token,pid,postDescription,mBody,postHeading, timeStamp );
 
         listCall.enqueue(new Callback<ResponseBody>() {
             @Override

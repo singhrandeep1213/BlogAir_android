@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,10 +87,47 @@ public class PostUserProfile extends Fragment {
 
         Log.e(TAG, "onCreateView: postUid: "+postUid );
 
-        callAPi();
+        callLoadAPi();
         recyclerviewInit(view);
 
+        unFollowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unFollowBtn.setEnabled(false);
+                callUnfollowApi(token,postUid);
+            }
+        });
+
     return  view;
+    }
+
+    private void callUnfollowApi(String token, String postUid) {
+
+        APIInterface userProfileApi= RetrofitManager.getRetrofit().create(APIInterface.class);
+        Call<ResponseBody> listCall= userProfileApi.unfollowUser("bearer " + token, postUid);
+
+        listCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+
+                    Toast.makeText(getActivity(), "Some error occured1", Toast.LENGTH_SHORT).show();
+                    unFollowBtn.setEnabled(true);
+
+                } else {
+                    Toast.makeText(getActivity(), "Unfollowed successfully", Toast.LENGTH_SHORT).show();
+                    unFollowBtn.setVisibility(View.GONE);
+                    followBtn.setVisibility(View.VISIBLE);
+                    unFollowBtn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "Some error occured2", Toast.LENGTH_SHORT).show();
+                unFollowBtn.setEnabled(true);
+            }
+        });
     }
 
     private void recyclerviewInit(View view) {
@@ -102,7 +140,7 @@ public class PostUserProfile extends Fragment {
     }
 
 
-    private void callAPi() {
+    private void callLoadAPi() {
 
         Log.e(TAG, "callAPi: token: "+token );
         APIInterface userProfileApi= RetrofitManager.getRetrofit().create(APIInterface.class);

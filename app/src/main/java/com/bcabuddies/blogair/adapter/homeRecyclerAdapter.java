@@ -103,7 +103,13 @@ public class homeRecyclerAdapter extends RecyclerView.Adapter<homeRecyclerAdapte
 
         //set time stamp
         long timeInMili = timeStamp.getTime();
+        SimpleDateFormat s= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        String tz = s.format(timeStamp);
+        Log.e(TAG, "onBindViewHolder: tz"+tz );
+        Log.e(TAG, "onBindViewHolder: tz mil"+timeInMili );
+
         String timeAgo = TimeAgo.getTimeAgo(timeInMili);
+
         if (timeAgo == "ADD_DATE") {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateformatMMDDYYYY = new SimpleDateFormat("dd MMMM" + ", " + "EEE");
             final StringBuilder nowMMDDYYYY = new StringBuilder(dateformatMMDDYYYY.format(timeStamp));
