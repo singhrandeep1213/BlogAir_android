@@ -13,10 +13,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.ProfileRecyclerAdapter;
 import com.bcabuddies.blogair.model.UserProfile;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
@@ -40,8 +41,8 @@ public class PostUserProfile extends Fragment {
     String token;
     CircleImageView thumbImageView;
     String profileType;
-    Button followBtn, unFollowBtn;
-    String thumbImage, followersCount, followingCount, fullName,bio;
+    Button followBtn, unFollowBtn, requestedBtn;
+    String thumbImage, followersCount, followingCount, fullName, bio;
     TextView fullNameTv, followerCountTv, followingCountTv, bioTv, userBioMore, userBioLess;
     ProfileRecyclerAdapter profileRecyclerAdapter;
     RecyclerView postRecyclerview;
@@ -74,7 +75,8 @@ public class PostUserProfile extends Fragment {
     unFollowBtn=view.findViewById(R.id.userprof_unfollowbtn);
     bioTv=view.findViewById(R.id.userprof_biotv);
     userBioMore=view.findViewById(R.id.userprof_biomore);
-    userBioLess=view.findViewById(R.id.userprof_bioless);
+        userBioLess = view.findViewById(R.id.userprof_bioless);
+        requestedBtn = view.findViewById(R.id.userprof_requestedbtn);
 
     fullNameTv.setText(fullName);
 
@@ -85,26 +87,75 @@ public class PostUserProfile extends Fragment {
         }
 
 
-        Log.e(TAG, "onCreateView: postUid: "+postUid );
+        Log.e(TAG, "onCreateView: postUid: " + postUid);
 
         callLoadAPi();
         recyclerviewInit(view);
+
+        followBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String fid = UUID.randomUUID().toString();
+                followBtn.setEnabled(false);
+                if (postUid != null && profileType != null) {
+                    callFollowApi(token, fid, postUid, profileType);
+                }
+
+            }
+
+        });
 
         unFollowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 unFollowBtn.setEnabled(false);
-                callUnfollowApi(token,postUid);
+                callUnfollowApi(token, postUid);
             }
         });
 
-    return  view;
+        return view;
+    }
+
+    private void callFollowApi(String token, String fid, String postUid, String profileType) {
+        APIInterface userProfileApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+        Call<ResponseBody> listCall = userProfileApi.followUser("bearer " + token, fid, postUid, profileType);
+
+        listCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+
+                    Toast.makeText(getActivity(), "Some error occured1", Toast.LENGTH_SHORT).show();
+                    followBtn.setEnabled(true);
+
+                } else {
+                    if (profileType.equals("public")) {
+                        Toast.makeText(getActivity(), "followed successfully", Toast.LENGTH_SHORT).show();
+                        followBtn.setVisibility(View.GONE);
+                        unFollowBtn.setVisibility(View.VISIBLE);
+                        unFollowBtn.setEnabled(true);
+                    } else if (profileType.equals("private")) {
+                        Toast.makeText(getActivity(), "Requested", Toast.LENGTH_SHORT).show();
+                        followBtn.setVisibility(View.GONE);
+                        requestedBtn.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "Some error occured2", Toast.LENGTH_SHORT).show();
+                followBtn.setEnabled(true);
+            }
+        });
+
     }
 
     private void callUnfollowApi(String token, String postUid) {
 
-        APIInterface userProfileApi= RetrofitManager.getRetrofit().create(APIInterface.class);
-        Call<ResponseBody> listCall= userProfileApi.unfollowUser("bearer " + token, postUid);
+        APIInterface userProfileApi = RetrofitManager.getRetrofit().create(APIInterface.class);
+        Call<ResponseBody> listCall = userProfileApi.unfollowUser("bearer " + token, postUid);
 
         listCall.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -118,7 +169,8 @@ public class PostUserProfile extends Fragment {
                     Toast.makeText(getActivity(), "Unfollowed successfully", Toast.LENGTH_SHORT).show();
                     unFollowBtn.setVisibility(View.GONE);
                     followBtn.setVisibility(View.VISIBLE);
-                    unFollowBtn.setEnabled(true);
+                    followBtn.setEnabled(true);
+                    callLoadAPi();
                 }
             }
 
@@ -153,6 +205,7 @@ public class PostUserProfile extends Fragment {
                     Toast.makeText(getActivity(), "Some error occured", Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    finallist.clear();
                     List<UserProfile.Post> posts= response.body().getPost();
                     Log.e(TAG, "onResponse: posts: " +posts);
                     finallist.addAll(posts);

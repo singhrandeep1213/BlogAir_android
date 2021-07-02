@@ -15,9 +15,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".home.SinglePost"></activity>
-
-
+        <activity android:name=".home.Notification"></activity>
+        <activity android:name=".home.SinglePost" />
         <!--
                Set to true if your app is Standalone, that is, it does not require the handheld
                app to run.

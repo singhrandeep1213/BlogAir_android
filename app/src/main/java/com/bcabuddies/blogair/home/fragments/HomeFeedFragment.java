@@ -1,10 +1,12 @@
 package com.bcabuddies.blogair.home.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,11 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bcabuddies.blogair.home.Notification;
 import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
+import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
@@ -40,6 +44,7 @@ public class HomeFeedFragment extends Fragment  {
     private static final String TAG = "HomeFeed";
     List<com.bcabuddies.blogair.model.HomeFeed.Post> finalList;
     PreferenceManager preferenceManager;
+    ImageView notificationIcon;
     String token, uid, fullName;
     public  int pageCount = 1;
     public  boolean noMoreResults = false;
@@ -70,7 +75,7 @@ public class HomeFeedFragment extends Fragment  {
 
 
         preferenceManager = new PreferenceManager(getActivity());
-
+        notificationIcon =view.findViewById(R.id.homefeed_notificon);
         token = preferenceManager.getString(Constants.KEY_JWT_TOKEN);
         uid = preferenceManager.getString(Constants.KEY_UID);
         fullName = preferenceManager.getString(Constants.KEY_FUll_NAME);
@@ -106,6 +111,12 @@ public class HomeFeedFragment extends Fragment  {
             }
         });
 
+        notificationIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity().getApplicationContext(), Notification.class));
+            }
+        });
 
 
         return view;

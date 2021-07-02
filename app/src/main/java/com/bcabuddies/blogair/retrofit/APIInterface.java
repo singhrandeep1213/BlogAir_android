@@ -2,11 +2,13 @@ package com.bcabuddies.blogair.retrofit;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.SinglePost;
 import com.bcabuddies.blogair.model.BlockedUsers;
 
 import com.bcabuddies.blogair.model.Bookmarks;
 import com.bcabuddies.blogair.model.Comments;
+import com.bcabuddies.blogair.model.FollowRequestUsers;
 import com.bcabuddies.blogair.model.HomeFeed;
 import com.bcabuddies.blogair.model.LoginToken;
 import com.bcabuddies.blogair.model.SearchUser;
@@ -156,6 +158,24 @@ public interface APIInterface {
     @POST("/user/unfollow")
     @FormUrlEncoded
     Call<ResponseBody> unfollowUser(@Header(("authorization")) String token, @Field("unfollow_uid") String unfollowUid);
+
+    //follow users
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/follow")
+    @FormUrlEncoded
+    Call<ResponseBody> followUser(@Header(("authorization")) String token,@Field("fid") String fid, @Field("follow_uid") String followUid, @Field("profile_type") String profileType);
+
+    //Get follow requests users list
+    @Headers(Constants.KEY_HEADER)
+    @GET("/user/follow/requests")
+    Call<FollowRequestUsers> followRequests(@Header("authorization") String token);
+
+    //follow request response
+    @Headers(Constants.KEY_HEADER)
+    @POST("/user/follow/response")
+    @FormUrlEncoded
+    Call<ResponseBody> followResponse(@Header(("authorization")) String token,@Field("response_type") String responseType, @Field("follower_uid") String followerUid ,@Field("fid") String fid );
+
 
 /*
     //test jwt auth token
