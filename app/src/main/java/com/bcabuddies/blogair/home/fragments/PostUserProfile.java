@@ -220,11 +220,18 @@ public class PostUserProfile extends Fragment {
                     if (profileType.equals("following")){
                         unFollowBtn.setVisibility(View.VISIBLE);
                         followBtn.setVisibility(View.GONE);
+                        requestedBtn.setVisibility(View.GONE);
                     }else if(profileType.equals("public")){
                         followBtn.setVisibility(View.VISIBLE);
                         unFollowBtn.setVisibility(View.GONE);
+                        requestedBtn.setVisibility(View.GONE);
                     }else if(profileType.equals("private")){
                         followBtn.setVisibility(View.VISIBLE);
+                        unFollowBtn.setVisibility(View.GONE);
+                        requestedBtn.setVisibility(View.GONE);
+                    }else if(profileType.equals("requested")){
+                        requestedBtn.setVisibility(View.VISIBLE);
+                        followBtn.setVisibility(View.GONE);
                         unFollowBtn.setVisibility(View.GONE);
                     }
 
