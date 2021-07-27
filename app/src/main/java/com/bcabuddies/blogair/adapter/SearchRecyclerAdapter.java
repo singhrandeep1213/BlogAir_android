@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
-import com.bcabuddies.blogair.model.BlockedUsers;
 import com.bcabuddies.blogair.model.SearchUser;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;

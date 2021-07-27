@@ -14,13 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcabuddies.blogair.home.Notification;
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.homeRecyclerAdapter;
+import com.bcabuddies.blogair.home.Notification;
 import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
-import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 

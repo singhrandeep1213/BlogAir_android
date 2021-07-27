@@ -1,7 +1,5 @@
 package com.bcabuddies.blogair.settings;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,8 +7,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.google.android.material.textfield.TextInputEditText;

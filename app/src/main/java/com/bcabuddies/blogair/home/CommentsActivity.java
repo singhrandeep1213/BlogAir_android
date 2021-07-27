@@ -1,9 +1,5 @@
 package com.bcabuddies.blogair.home;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,10 +10,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.CommentsRecyclerAdapter;
 import com.bcabuddies.blogair.model.Comments;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;

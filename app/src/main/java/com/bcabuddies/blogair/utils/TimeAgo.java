@@ -1,12 +1,6 @@
 package com.bcabuddies.blogair.utils;
 
-import android.content.Context;
 import android.util.Log;
-
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class TimeAgo {
 

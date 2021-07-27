@@ -24,12 +24,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.CommentsActivity;
 import com.bcabuddies.blogair.home.fragments.PostUserProfile;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
 import com.bcabuddies.blogair.model.HomeFeed;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;

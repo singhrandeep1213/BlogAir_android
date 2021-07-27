@@ -17,7 +17,6 @@ import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.SearchRecyclerAdapter;
 import com.bcabuddies.blogair.model.SearchUser;
 import com.bcabuddies.blogair.retrofit.APIInterface;
-import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.google.android.material.textfield.TextInputEditText;

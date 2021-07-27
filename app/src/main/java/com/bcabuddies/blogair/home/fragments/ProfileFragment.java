@@ -13,10 +13,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.ProfileRecyclerAdapter;
+import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.UserProfile;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
 import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
@@ -108,6 +109,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity().getApplicationContext(), SettingsMain.class));
+                getActivity().finish();
             }
         });
 

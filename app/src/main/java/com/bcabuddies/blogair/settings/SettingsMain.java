@@ -1,18 +1,18 @@
 package com.bcabuddies.blogair.settings;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bcabuddies.blogair.welcome.Welcome;
@@ -28,8 +28,15 @@ public class SettingsMain extends AppCompatActivity {
     PreferenceManager preferenceManager;
     TextView fullNameTv;
     ImageView backImageIcon;
+    private static final String TAG = "SettingsMain";
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.e(TAG, "onBackPressed: here" );
+        startActivity(new Intent(SettingsMain.this, MainActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,8 @@ public class SettingsMain extends AppCompatActivity {
                 startActivity(new Intent(SettingsMain.this, Welcome.class));
             }
         });
+
+
 
     }
 }

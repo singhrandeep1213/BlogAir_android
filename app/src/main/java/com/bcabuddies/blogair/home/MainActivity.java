@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -17,7 +15,6 @@ import com.bcabuddies.blogair.home.fragments.BookmarksFragment;
 import com.bcabuddies.blogair.home.fragments.HomeFeedFragment;
 import com.bcabuddies.blogair.home.fragments.ProfileFragment;
 import com.bcabuddies.blogair.home.fragments.SearchFragment;
-import com.bcabuddies.blogair.settings.SettingsMain;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bumptech.glide.Glide;

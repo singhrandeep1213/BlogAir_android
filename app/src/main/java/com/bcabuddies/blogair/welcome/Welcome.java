@@ -9,13 +9,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.adapter.WelcomeViewPagerAdapter;
-
 import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.WelcomeViewPagerModel;
 import com.bcabuddies.blogair.signIn.SignIn;

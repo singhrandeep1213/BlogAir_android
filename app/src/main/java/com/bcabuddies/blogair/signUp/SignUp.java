@@ -11,10 +11,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.R;
 import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.LoginToken;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.signIn.SignIn;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;

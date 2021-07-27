@@ -1,8 +1,5 @@
 package com.bcabuddies.blogair.settings;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -15,9 +12,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bcabuddies.blogair.retrofit.APIInterface;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bcabuddies.blogair.R;
+import com.bcabuddies.blogair.home.MainActivity;
 import com.bcabuddies.blogair.model.ThumbImageResponse;
+import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 import com.bumptech.glide.Glide;
@@ -231,6 +232,8 @@ public class SettingsAccount extends AppCompatActivity {
                     preferenceManager.saveString(Constants.KEY_THUMB_IMAGE,response.body().getThumb_image());
                     Toast.makeText(SettingsAccount.this, "Successfully updated", Toast.LENGTH_SHORT).show();
                     thumbImage.setImageURI(thumbImageUri);
+                    ;
+
                 }
             }
 

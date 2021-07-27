@@ -1,11 +1,6 @@
 package com.bcabuddies.blogair.retrofit;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.home.SinglePost;
 import com.bcabuddies.blogair.model.BlockedUsers;
-
 import com.bcabuddies.blogair.model.Bookmarks;
 import com.bcabuddies.blogair.model.Comments;
 import com.bcabuddies.blogair.model.FollowRequestUsers;
@@ -17,8 +12,6 @@ import com.bcabuddies.blogair.model.ThumbImageResponse;
 import com.bcabuddies.blogair.model.UserProfile;
 import com.bcabuddies.blogair.utils.Constants;
 
-import java.util.List;
-
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -26,7 +19,6 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import retrofit2.http.HEAD;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;

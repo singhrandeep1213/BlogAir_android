@@ -1,22 +1,19 @@
 package com.bcabuddies.blogair.home;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bcabuddies.blogair.R;
-import com.bcabuddies.blogair.adapter.BlockedUsersRecyclerAdapter;
 import com.bcabuddies.blogair.adapter.FollowRequestRecyclerAdapter;
-import com.bcabuddies.blogair.model.BlockedUsers;
 import com.bcabuddies.blogair.model.FollowRequestUsers;
 import com.bcabuddies.blogair.retrofit.APIInterface;
 import com.bcabuddies.blogair.retrofit.RetrofitManager;
-import com.bcabuddies.blogair.settings.SettingsBlockedUsers;
 import com.bcabuddies.blogair.utils.Constants;
 import com.bcabuddies.blogair.utils.PreferenceManager;
 
